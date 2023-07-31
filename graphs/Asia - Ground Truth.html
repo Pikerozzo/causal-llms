@@ -97,7 +97,7 @@
 
                   // parsing and collecting nodes and edges from the python
                   nodes = new vis.DataSet([{"color": "#97c2fc", "id": 0, "label": "visit to Asia", "shape": "dot"}, {"color": "#97c2fc", "id": 1, "label": "tubercolosis", "shape": "dot"}, {"color": "#97c2fc", "id": 2, "label": "lung cancer", "shape": "dot"}, {"color": "#97c2fc", "id": 3, "label": "bronchitis", "shape": "dot"}, {"color": "#97c2fc", "id": 4, "label": "dyspnoea", "shape": "dot"}, {"color": "#97c2fc", "id": 5, "label": "smoking", "shape": "dot"}, {"color": "#97c2fc", "id": 6, "label": "positive X-ray", "shape": "dot"}]);
-                  edges = new vis.DataSet([{"arrows": "to", "from": 0, "to": 1}, {"arrows": "to", "from": 5, "to": 2}, {"arrows": "to", "from": 5, "to": 3}, {"arrows": "to", "from": 3, "to": 4}, {"arrows": "to", "from": 2, "to": 4}, {"arrows": "to", "from": 1, "to": 4}, {"arrows": "to", "from": 2, "to": 6}, {"arrows": "to", "from": 1, "to": 6}]);
+                  edges = new vis.DataSet([{"arrows": "to", "from": 0, "options": {"color": "black"}, "to": 1}, {"arrows": "to", "from": 5, "options": {"color": "black"}, "to": 2}, {"arrows": "to", "from": 5, "options": {"color": "black"}, "to": 3}, {"arrows": "to", "from": 3, "options": {"color": "black"}, "to": 4}, {"arrows": "to", "from": 2, "options": {"color": "black"}, "to": 4}, {"arrows": "to", "from": 1, "options": {"color": "black"}, "to": 4}, {"arrows": "to", "from": 2, "options": {"color": "black"}, "to": 6}, {"arrows": "to", "from": 1, "options": {"color": "black"}, "to": 6}]);
 
                   nodeColors = {};
                   allNodes = nodes.get({ returnType: "Object" });
