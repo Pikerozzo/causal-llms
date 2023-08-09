@@ -40,18 +40,8 @@ organization = os.getenv('IDSIA_ORGANIZATION')
 openai.api_key = api_key
 openai.organization = organization
 
-models = openai.Model.list()
-model_ids = [model['id'] for model in models['data']]
 
-gpt_4 = 'gpt-4'
-default_model = 'gpt-3.5-turbo'
-if gpt_4 in model_ids:
-    default_model = gpt_4
-
-default_model
-
-
-def gpt_request(system_msg, user_msg, model=default_model, temperature=0):
+def gpt_request(system_msg, user_msg, model='gpt-3.5-turbo', temperature=0):
     if not system_msg or not user_msg:
         return None
     try:
@@ -238,19 +228,10 @@ Your goal is to create a JSON object where the keys represent the root word enti
 an array of its synonyms, i.e., words or entities that can be used interchangeably to the root word.
 If a root word entity has no synonyms, its value in the JSON should be an empty array.
 
-Ensure that each entity appears only once in the dictionary, either as key (i.e. root word) or as element in the value arrays (i.e. the synonyms):
-an entity must must not appear as key if it is the synonym (i.e. in the value array) of another entity, and the other way around (i.e. must not be 
-in the value array of an entity if it is already a key of the JSON object).
-An entity must not be a synonym of itself.
+Ensure that each entity appears only once in the dictionary, either as key (i.e. root word) or as element in the value arrays (i.e. the synonyms).
 
-You should efficiently process the given list of entities and produce the desired dictionary structure.
-The output JSON object should accurately represent the optimized entities and their synonyms based on the provided list.
-
-Then provide your final JSON object answer within the tags <Answer>[json_object]</Answer>, (e.g. <Answer>{{
-    "smoking": ["tobacco", "nicotine", "cigarettes", "cigar"],
-    "cancer": ["lung cancer"],
-    "tumors": []
-}}</Answer>).
+You should efficiently process the given list of entities and produce the desired dictionary structure. The output JSON object should accurately represent the optimized
+entities and their synonyms based on the provided list.
 
 Follow the example below to understand the expected output.
 
@@ -266,26 +247,19 @@ Given the initial list of entities:
 <Entity>cigarettes</Entity>
 <Entity>cigar</Entity>
 
-You should pair the synonyms, generate the following JSON object and provide it as your answer:
-<Answer>
+You should pair the synonyms and generate the following JSON object:
 {{
     "smoking": ["tobacco", "nicotine", "cigarettes", "cigar"],
     "cancer": ["lung cancer"],
     "tumors": []
 }}
-</Answer>
-
-Note that every entity appears only once in the output JSON object, either as key or as element in the value arrays.
-
-After you have finished building the JSON object, check and make sure that every entity appears only once in the output JSON object, either as key or as element in the value arrays.
 '''
     
     response = gpt_request(system_msg, user_msg)
+    
     if response:
-        soup = BeautifulSoup(response, 'html.parser')
-        answer = soup.find('answer').text
         try:
-            opt_entities = json.loads(answer)
+            opt_entities = json.loads(response)
             if opt_entities:
                 return opt_entities
         except (json.JSONDecodeError, TypeError):
@@ -557,14 +531,21 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_text_in_causal_
         print('--')
 
     if optimize_found_entities:
-        opt_entities = optimize_entities(entities, text=(text if use_text_in_entity_optimization else None))
+        if use_text_in_entity_optimization:
+            opt_entities = optimize_entities(entities, text)
+        else:
+            opt_entities = optimize_entities(entities)
         entities = list(opt_entities.keys())
 
         if verbose:
             print(f'Optimized Entities: ({len(entities)})')
             print(entities)
 
-    graph_edges = gpt_causal_discovery(entities, text=(text if use_text_in_causal_discovery else None), use_pretrained_knowledge=use_LLM_pretrained_knowledge_in_causal_discovery, reverse_variable_check=reverse_edge_for_variable_check, verbose=verbose)
+    if use_text_in_causal_discovery:
+        graph_edges = gpt_causal_discovery(entities, text, use_pretrained_knowledge=use_LLM_pretrained_knowledge_in_causal_discovery, reverse_variable_check=reverse_edge_for_variable_check, verbose=verbose)
+    else:
+        graph_edges = gpt_causal_discovery(entities, use_pretrained_knowledge=use_LLM_pretrained_knowledge_in_causal_discovery, reverse_variable_check=reverse_edge_for_variable_check, verbose=verbose)
+
 
     edges = extract_edge_answers(graph_edges)
     if verbose:
@@ -623,7 +604,7 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_text_in_causal_
 def smoking_test():
     text = 'Smoking involves inhaling tobacco fumes and it causes lung cancer and tumors.'
     text_title = 'Smoking - test'
-    return causal_discovery_pipeline(text_title, text, use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, optimize_found_entities=True, use_text_in_entity_optimization=True, search_cycles=True, plot_graphs=False, plot_interactive_graph=False, verbose=True)
+    causal_discovery_pipeline(text_title, text, use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, optimize_found_entities=True, use_text_in_entity_optimization=True, search_cycles=True, plot_graphs=True, plot_interactive_graph=False, verbose=True)
 
 
 
