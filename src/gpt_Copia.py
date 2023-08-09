@@ -6,7 +6,7 @@ import pkgutil
 
 packages_to_install = [
     'openai', 'pyvis', 'plotly', 'cdt', 'python-dotenv',
-    'pandas', 'matplotlib', 'requests', 'bs4', 'lxml'
+    'pandas', 'matplotlib', 'requests', 'bs4', 'lxml', 'tqdm'
 ]
 
 for package in packages_to_install:
@@ -21,11 +21,13 @@ import plotly.graph_objects as go
 import re
 from bs4 import BeautifulSoup
 import time
+from tqdm import tqdm
+from itertools import permutations, combinations
 import json
 
 import networkx as nx
 from pyvis.network import Network
-# from cdt.metrics import SHD, precision_recall
+from cdt.metrics import SHD, precision_recall
 
 import os
 from dotenv import load_dotenv, find_dotenv
@@ -139,6 +141,8 @@ If no clear causal relationship is apparent, select the appropriate option accor
 
 Then provide your final answer within the tags <Answer>[answer]</Answer>, (e.g. <Answer>C</Answer>).
 '''
+    total_iterations = len(list(permutations(entities, 2))) if reverse_variable_check else len(list(combinations(entities, 2)))
+    progress_bar = tqdm(total=total_iterations, desc="Progress")
 
     for i1, e1 in enumerate(entities):
         for i2, e2 in enumerate(entities):
@@ -176,6 +180,10 @@ Then provide your final answer within the tags <Answer>[answer]</Answer>, (e.g. 
                 if verbose:
                     print(graph_edges[-1]) # TODO remove
                     print('----------------------------------')
+            
+            progress_bar.update(1)
+
+    progress_bar.close()
     
     return graph_edges
 
@@ -551,6 +559,9 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_text_in_causal_
             print('Skipping NER operation. Using provided entities.')
             print('--')
 
+
+    print(f'Entities: ({len(entities)} = {entities})')
+
     if verbose:
         print(f'Entities: ({len(entities)})')
         print(entities)
@@ -564,7 +575,12 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_text_in_causal_
             print(f'Optimized Entities: ({len(entities)})')
             print(entities)
 
+        print(f'Optimized Entities: ({len(entities)} = {entities})')
+        
+
     graph_edges = gpt_causal_discovery(entities, text=(text if use_text_in_causal_discovery else None), use_pretrained_knowledge=use_LLM_pretrained_knowledge_in_causal_discovery, reverse_variable_check=reverse_edge_for_variable_check, verbose=verbose)
+
+    print('GPT CAUSAL QUERY DONE')
 
     edges = extract_edge_answers(graph_edges)
     if verbose:
@@ -591,6 +607,8 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_text_in_causal_
 
         valid_edges.extend(corrected_edges)
         edges = valid_edges
+        
+        print('EDGE CORRECTION DONE')
     
     nodes, processed_edges, bidirected_edges, graph = preprocess_edges(edges)
 

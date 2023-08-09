@@ -38,39 +38,54 @@ def scraping_and_causal_analysis():
 
 
 def scraping_and_causal_analysis_test():
-    data = pd.read_csv('../data/dummy_data.csv')
+    print('CAUSAL ANALYSIS TEST FROM SAVED DATA')
+
+    data = pd.read_csv('../data/script_test.csv')
+    if data is None:
+        print('ERROR: No data')
+        sys.exit()
+
     graph_results = pd.DataFrame(columns=['article_id', 'title', 'abstract', 'keywords', 'nodes', 'edges', 'cycles'])
 
     for row in data.iterrows():
-        # id, title, abstract, keywords, pub_date, search_terms
         row = row[1]
-        nodes, edges, cycles = gpt_Copia.causal_discovery_pipeline(row['title'], row['abstract'], use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, optimize_found_entities=True, use_text_in_entity_optimization=True, search_cycles=True, plot_graphs=True, plot_interactive_graph=False, verbose=False)
+        if len(row['abstract'].split(' ')) > 200:
+            continue
+
+        # print(row['title'])
+        print(f'\n-------- {row["title"]} --------\n')
+        nodes, edges, cycles = gpt_Copia.causal_discovery_pipeline(row['title'], row['abstract'], use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, optimize_found_entities=True, use_text_in_entity_optimization=True, search_cycles=True, plot_graphs=False, plot_interactive_graph=True, verbose=False)
         graph_results = pd.concat([graph_results, pd.DataFrame({
-            'article_id': row['id'], 'title': row['title'], 'abstract': row['abstract'], 'keywords': row['keywords'], 'nodes': [nodes], 'edges': [edges], 'cycles': [cycles]
+            'article_id': row['article_id'], 'title': row['title'], 'abstract': row['abstract'], 'keywords': row['keywords'], 'nodes': [nodes], 'edges': [edges], 'cycles': [cycles]
             }, index=[0])]).reset_index(drop=True)
+        
     
     graph_results.to_csv(f'../data/graphs/causal_analysis_results{time.time().as_integer_ratio()[0]}.csv', index=False)
 
 def smoking_test():
-    title = 'SMOKING TEST'
-    print(title)
-    nodes, edges, cycles = gpt_Copia.smoking_test()
+    print('smoking test FROM SAVED DATA')
 
-    print('\n')
-    
-    print(nodes)
-    print('-----')
-    print(edges)
-    print('-----')
-    print(cycles)
+    data = pd.read_csv('../data/dummy_data.csv')
+    if data is None:
+        print('ERROR: No data')
+        sys.exit()
 
     graph_results = pd.DataFrame(columns=['article_id', 'title', 'abstract', 'keywords', 'nodes', 'edges', 'cycles'])
-    graph_results = pd.concat([graph_results, pd.DataFrame({
-        'article_id': 1, 'title': title, 'abstract': 'Smoking involves inhaling tobacco fumes and it causes lung cancer and tumors.', 'keywords': [], 
-        'nodes': [nodes], 'edges': [edges], 'cycles': [cycles]
-    }, index=[0])]).reset_index(drop=True)
-    graph_results.to_csv(f'../data/graphs/{title}_results_{time.time().as_integer_ratio()[0]}.csv', index=False)
 
+    for row in data.iterrows():
+        row = row[1]
+        if len(row['abstract'].split(' ')) > 200:
+            continue
+
+        # print(row['title'])
+        print(f'\n-------- {row["title"]} --------\n')
+        nodes, edges, cycles = gpt_Copia.causal_discovery_pipeline(row['title'], row['abstract'], use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, optimize_found_entities=True, use_text_in_entity_optimization=True, search_cycles=True, plot_graphs=False, plot_interactive_graph=True, verbose=False)
+        graph_results = pd.concat([graph_results, pd.DataFrame({
+            'article_id': row['article_id'], 'title': row['title'], 'abstract': row['abstract'], 'keywords': row['keywords'], 'nodes': [nodes], 'edges': [edges], 'cycles': [cycles]
+            }, index=[0])]).reset_index(drop=True)
+        
+    
+    graph_results.to_csv(f'../data/graphs/causal_analysis_results{time.time().as_integer_ratio()[0]}.csv', index=False)
 
 
 def ciao():

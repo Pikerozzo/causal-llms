@@ -1,0 +1,2 @@
+article_id,title,abstract,keywords,nodes,edges,cycles
+1,Smoking test from dummy.csv,Smoking involves inhaling tobacco fumes and it can cause lung cancer and tumors,"['smoking','lung cancer']","['Smoking', 'inhaling tobacco fumes', 'lung cancer', 'tumors']","[('Smoking', 'inhaling tobacco fumes'), ('Smoking', 'lung cancer'), ('Smoking', 'tumors'), ('inhaling tobacco fumes', 'lung cancer'), ('inhaling tobacco fumes', 'tumors'), ('lung cancer', 'tumors'), ('tumors', 'lung cancer')]",[]
