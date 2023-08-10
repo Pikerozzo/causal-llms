@@ -96,8 +96,8 @@
                   
 
                   // parsing and collecting nodes and edges from the python
-                  nodes = new vis.DataSet([{"color": "#97c2fc", "id": 0, "label": "1", "shape": "dot"}, {"color": "#97c2fc", "id": 1, "label": "2", "shape": "dot"}, {"color": "#97c2fc", "id": 2, "label": "4", "shape": "dot"}, {"color": "#97c2fc", "id": 3, "label": "3", "shape": "dot"}, {"color": "#97c2fc", "id": 4, "label": "5", "shape": "dot"}]);
-                  edges = new vis.DataSet([{"arrows": "to", "from": 1, "to": 2}, {"arrows": "to", "from": 3, "to": 4}, {"arrows": "to", "from": 1, "to": 0}, {"arrows": "to", "from": 2, "to": 3}, {"arrows": "to", "from": 0, "to": 3}, {"arrows": "to", "from": 3, "to": 1}, {"arrows": "to", "from": 1, "to": 4}]);
+                  nodes = new vis.DataSet([{"color": "#97c2fc", "id": "SMOKING", "label": "SMOKING", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "CANCER", "label": "CANCER", "shape": "dot", "size": 10}]);
+                  edges = new vis.DataSet([{"arrows": "to", "color": "black", "from": "SMOKING", "style": "solid", "title": "Text explanation for this edge (SMOKING-CANCER) direction", "to": "CANCER", "width": 1}]);
 
                   nodeColors = {};
                   allNodes = nodes.get({ returnType: "Object" });

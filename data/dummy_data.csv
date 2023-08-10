@@ -1,2 +1,2 @@
-article_id,title,abstract,keywords,nodes,edges,cycles
+id,title,abstract,keywords,nodes,edges,cycles
 00001,Smoking test from dummy.csv,Smoking involves inhaling tobacco fumes and it can cause lung cancer and tumors,"['smoking','lung cancer']",,,
