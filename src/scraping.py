@@ -5,7 +5,7 @@ import subprocess
 import pkgutil
 
 packages_to_install = [
-    'numpy', 'python-dotenv', 'pandas', 'matplotlib', 'requests', 'bs4', 'lxml'
+    'python-dotenv', 'numpy', 'python-dotenv', 'pandas', 'matplotlib', 'requests', 'bs4', 'lxml'
 ]
 
 for package in packages_to_install:
@@ -20,11 +20,15 @@ import re
 from bs4 import BeautifulSoup
 from datetime import datetime
 import sys
+import os
+from dotenv import load_dotenv, find_dotenv
 
 
 
 base_url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/'
-api_key = 'cf94d59a96d4b17b7389dde3a72724a2eb08'
+
+_ = load_dotenv(find_dotenv())
+api_key  = os.getenv('PUBMED_API_KEY')
 
 
 
@@ -202,3 +206,8 @@ def main(return_data=True):
             break
     if return_data:
         return data
+
+
+
+if __name__ == "__main__":
+    main()

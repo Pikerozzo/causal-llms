@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import datetime
 import subprocess
 import pkgutil
 
 packages_to_install = [
     'openai', 'pyvis', 'plotly', 'cdt', 'python-dotenv',
-    'pandas', 'matplotlib', 'requests', 'bs4', 'lxml', 'tqdm'
+    'pandas', 'matplotlib', 'requests', 'bs4', 'lxml', 'tqdm', 'torch'
 ]
 
 for package in packages_to_install:
@@ -27,6 +28,8 @@ import json
 
 import networkx as nx
 from pyvis.network import Network
+import graph_tool.all as gt
+
 from cdt.metrics import SHD, precision_recall
 
 import os
@@ -47,7 +50,8 @@ model_ids = [model['id'] for model in models['data']]
 
 gpt_4 = 'gpt-4'
 default_model = 'gpt-3.5-turbo'
-if gpt_4 in model_ids:
+use_gpt_4 = True
+if use_gpt_4 and gpt_4 in model_ids:
     default_model = gpt_4
 
 default_model
@@ -492,34 +496,56 @@ def preprocess_edges(edges):
     return nodes, processed_edges, bidirected_edges, graph
 
 
-def build_graph(nodes, edges=[], bidirected_edges=[], search_and_highlight_cycles=True, plot_interactive_graph=True, plot_graph=True, graph_name='mygraph'):
+def find_cycles(nodes=[], edges=[]):
+    if not nodes or not edges:
+        return []
 
-    if plot_graph:
+    g = gt.Graph(directed=True)
+
+    nodes_ids = {}
+    v_prop = g.new_vertex_property("string")
+    for n in nodes:
+        v = g.add_vertex()
+        v_prop[v] = n
+        nodes_ids[n] = v
+
+    # e_prop = g.new_edge_property("string")
+    for (n1, n2) in edges:
+        e = g.add_edge(nodes_ids[n1], nodes_ids[n2])
+
+    cycles = []
+    for c in gt.all_circuits(g):
+        cycles.append([v_prop[v] for v in c])
+
+    return cycles
+
+
+def build_graph(nodes, edges=[], bidirected_edges=[], cycles=[], plot_static_graph=True, directory_name='../graphs', graph_name='mygraph'):
+
+    if plot_static_graph:
         plt.figure()
     G = nx.DiGraph()
 
     G.add_nodes_from(nodes)
 
     for e1, e2 in edges:
-        G.add_edge(e1, e2, title=f'Text explanation for this edge ({e1}-{e2}) direction', color='black', style='solid')
+        G.add_edge(e1, e2, color='black', style='solid')
 
-    cycles = None
     cycles_edges = []
-    if search_and_highlight_cycles:
-        cycles = nx.recursive_simple_cycles(G)
-        for cycle in cycles:
-            for i in range(len(cycle) - 1):
-                G[cycle[i]][cycle[i + 1]]['color'] = 'red'
-            G[cycle[-1]][cycle[0]]['color'] = 'red'
+    for cycle in cycles:
+        for i in range(len(cycle) - 1):
+            G[cycle[i]][cycle[i + 1]]['color'] = 'red'
+        G[cycle[-1]][cycle[0]]['color'] = 'red'
 
-            cycle_edges = [(cycle[i], cycle[i + 1]) for i in range(len(cycle) - 1)]
-            cycle_edges.append((cycle[-1], cycle[0]))
-            cycles_edges.append(cycle_edges)
+            # cycle_edges = [(cycle[i], cycle[i + 1]) for i in range(len(cycle) - 1)]
+            # cycle_edges.append((cycle[-1], cycle[0]))
+            # cycles_edges.append(cycle_edges)
 
+    
     for e1, e2 in bidirected_edges:
-        G.add_edge(e1, e2, title=f'Text explanation for this edge ({e1}-{e2}) direction', color='grey', style='dashed')
+        G.add_edge(e1, e2, color='grey', style='dashed')
 
-    if plot_graph:
+    if plot_static_graph:
         pos = nx.spring_layout(G)
         nx.draw_networkx_nodes(G, pos)
         nx.draw_networkx_labels(G, pos)
@@ -533,20 +559,15 @@ def build_graph(nodes, edges=[], bidirected_edges=[], search_and_highlight_cycle
         plt.title(graph_name)
         plt.show()
 
-    if plot_interactive_graph:
-        net = Network(directed=True, notebook=True)
-        net.from_nx(G)
-        net.force_atlas_2based()
-        net.show_buttons(filter_=['physics'])
-        net.show(f'../graphs/{graph_name}.html')
-
-    if search_and_highlight_cycles:
-        return cycles, cycles_edges
-    else:
-        return None, None
+    net = Network(directed=True, notebook=True)
+    net.from_nx(G)
+    net.force_atlas_2based()
+    net.show_buttons(filter_=['physics'])
+    os.makedirs(directory_name, exist_ok=True)
+    net.save_graph(f'{directory_name}/{graph_name}.html')
 
 
-def causal_discovery_pipeline(text_title, text, entities=[], use_text_in_causal_discovery=False, use_LLM_pretrained_knowledge_in_causal_discovery=False, reverse_edge_for_variable_check=False, optimize_found_entities=True, use_text_in_entity_optimization=True, search_cycles=True, plot_graphs=True, plot_interactive_graph=True, verbose=False):
+def causal_discovery_pipeline(text_title, text, entities=[], use_text_in_causal_discovery=False, use_LLM_pretrained_knowledge_in_causal_discovery=False, reverse_edge_for_variable_check=False, optimize_found_entities=True, use_text_in_entity_optimization=True, search_cycles=True, plot_static_graph=True, graph_directory_name='../graphs', verbose=False):
     if verbose:
         print('Text:')
         print(text)
@@ -620,7 +641,15 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_text_in_causal_
         print(processed_edges)
         print('--')
 
-    cycles, cycles_edges = build_graph(nodes=nodes, edges=processed_edges, bidirected_edges=bidirected_edges, search_and_highlight_cycles=search_cycles, plot_interactive_graph=plot_interactive_graph, plot_graph=plot_graphs, graph_name=text_title)
+    cycles = []
+    if search_cycles:
+        start = time.time()
+        print(f'Looking for cycles... {datetime.now().strftime("%H:%M:%S %d/%m/%Y")}')
+        cycles = find_cycles(nodes=nodes, edges=processed_edges)
+        elapsed_seconds = time.time() - start
+        print(f'{len(cycles)} cycles found - exec time : {time.strftime("%H:%M:%S", time.gmtime(elapsed_seconds))}')
+    build_graph(nodes=nodes, edges=processed_edges, bidirected_edges=bidirected_edges, cycles=cycles, plot_static_graph=plot_static_graph, directory_name=graph_directory_name, graph_name=text_title)
+    
     if verbose:
         if cycles:
             print('GRAPH IS CYCLIC')
@@ -642,6 +671,12 @@ def smoking_test():
     text = 'Smoking involves inhaling tobacco fumes and it causes lung cancer and tumors.'
     text_title = 'Smoking - test'
     return causal_discovery_pipeline(text_title, text, use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, optimize_found_entities=True, use_text_in_entity_optimization=True, search_cycles=True, plot_graphs=False, plot_interactive_graph=False, verbose=True)
+
+
+
+
+
+
 
 
 
@@ -833,7 +868,3 @@ def run_benchmarks():
 
     precision_recall_curve_plot(titles, curves)
     f1_score_hist(titles, curves)
-
-
-def ciao():
-    print('CIAO')

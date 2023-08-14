@@ -1,38 +1,77 @@
 import sys
 import argparse
 import scraping
-import gpt_Copia
+import gpt
 import pandas as pd
 import re
 import time
+from datetime import datetime
+
+import json
+
+import os
+
+
+def sanitize_string(string):
+    return re.sub(r'[\\/:*?"<>|]', '_', string)
+
 
 def causal_analysis(data, file_name=None, use_short_abstracts=False, max_abstract_length=200):
-    if not file_name:
-        file_name = f'../data/graphs/causal_analysis_results_{time.time().as_integer_ratio()[0]}.csv'
+    
+    print(f'Starting at : {datetime.now().strftime("%H:%M:%S %d/%m/%Y")}')
 
-    results = pd.DataFrame(columns=['id', 'title', 'abstract', 'keywords', 'nodes', 'edges', 'cycles'])
+    if file_name:
+        file_name = sanitize_string(file_name)
+    else:
+        file_name = f'causal_analysis_results.csv'
+    
+    directory = f'../results/{datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}'
+    file_name = f'{directory}/{file_name}'
+    graphs_directory = f'{directory}/graphs'
+    os.makedirs(directory, exist_ok=True)
+
+    results = pd.DataFrame(columns=['id', 'title', 'abstract'])
+
+    print(len(data))
 
     for row in data.iterrows():
         row = row[1]
         if use_short_abstracts and len(row['abstract'].split(' ')) > max_abstract_length:
             continue
 
-        print(f'\n-------- {row["title"]} --------\n')
-        nodes, edges, cycles = gpt_Copia.causal_discovery_pipeline(row['title'], row['abstract'], use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, optimize_found_entities=True, use_text_in_entity_optimization=True, search_cycles=True, plot_graphs=False, plot_interactive_graph=True, verbose=False)
-        new_row = pd.DataFrame({'id': row['id'], 'title': row['title'], 'abstract': row['abstract'], 'keywords': row['keywords'], 'nodes': [nodes], 'edges': [edges], 'cycles': [cycles]}, index=[0])
-        results = pd.concat([results, new_row]).reset_index(drop=True)
+        title = sanitize_string(row['title'])
+        max_title_length = 35
+        tunc_title = title[:max_title_length] + (title[max_title_length:] and '..')
+        article_ref = f'{row["id"]}-{tunc_title}'
 
+
+        print(f'\n-------- {row["title"]} --------\n')
+        # nodes, edges, cycles = gpt.causal_discovery_pipeline(article_ref, row['abstract'], use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, optimize_found_entities=True, use_text_in_entity_optimization=True, search_cycles=True, plot_graphs=False, plot_interactive_graph=True, graph_directory_name=graphs_directory, verbose=False)
+        nodes, edges, cycles = gpt.causal_discovery_pipeline(article_ref, row['abstract'], use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, optimize_found_entities=True, use_text_in_entity_optimization=True, search_cycles=True, plot_static_graph=False, graph_directory_name=graphs_directory, verbose=False)
+        new_row = pd.DataFrame({'id': row['id'], 'title': row['title'], 'abstract': row['abstract']}, index=[0])
+        results = pd.concat([results, new_row]).reset_index(drop=True)
         results.to_csv(file_name, index=False)
+
+
+        graph_data = {'nodes': [nodes], 'edges': [edges], 'cycles': [cycles]}
+        with open(f'{graphs_directory}/{article_ref}.json', "w") as json_file:
+            json.dump(graph_data, json_file, indent=4)
+
 
     return results
 
 
+
+
 def causal_analysis_test():
-    print('-+-+-+-+-+-+-+-+-')
-    # df = pd.read_csv('../data/pubmed_data.csv')
-    # short_abs_data = df.loc[df['abstract'].apply(lambda x: len(x.split())).sort_values().head(5)]
-    short_abs_data = pd.DataFrame({'id': [1], 'title': ['Smoking test'], 'abstract': ['Smoking involves inhaling tobacco fumes and can cause lung cancer and tumors'], 'keywords': [['smoking', 'lung cancer', 'tumors']]})
-    causal_analysis(short_abs_data)
+    df = pd.read_csv('../data/dummy_data.csv')
+
+    df = pd.read_csv('../data/pubmed_data.csv')
+    df = df.sample(50)
+    # df = df.loc[df['abstract'].apply(lambda x: len(x.split())).sort_values().head(5)]
+
+    causal_analysis(df)
+
 
 
 
@@ -41,42 +80,15 @@ def scraping_and_causal_analysis():
     if data is None:
         print('ERROR: No data')
         sys.exit()
-    
+
     causal_analysis(data)
 
 
-# def _scraping_and_causal_analysis():
-#     data = scraping.main(return_data=True)
-#     if data is None:
-#         print('ERROR: No data')
-#         sys.exit()
-    
-#     file_name = f'../data/graphs/causal_analysis_results{time.time().as_integer_ratio()[0]}.csv'
-#     results = pd.DataFrame(columns=['id', 'title', 'abstract', 'keywords', 'nodes', 'edges', 'cycles'])
-
-#     for row in data.iterrows():
-#         row = row[1]
-#         print(f'\n-------- {row["title"]} --------\n')
-#         nodes, edges, cycles = gpt_Copia.causal_discovery_pipeline(row['title'], row['abstract'], use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, optimize_found_entities=True, use_text_in_entity_optimization=True, search_cycles=True, plot_graphs=True, plot_interactive_graph=False, verbose=False)
-#         new_row = pd.DataFrame({'id': row['id'], 'title': row['title'], 'abstract': row['abstract'], 'keywords': row['keywords'], 'nodes': [nodes], 'edges': [edges], 'cycles': [cycles]}, index=[0])
-#         results = pd.concat([results, new_row]).reset_index(drop=True)
-
-#         results.to_csv(file_name, index=False)
 
 
-
-
-#     # TODO - add check for max length of abstract before proceeding with causal analysis
-#     #   words = re.findall(r'\b\w+\b', text)
-#     #   return len(words)
-    
-#     # TODO - save to file causal analysis results
     
 #     # TODO - add command line parameters for operations
     
-#     # TODO - test on server
-
-#     results.to_csv(file_name, index=False)
 
 
 def scraping_and_causal_analysis_test():
@@ -99,7 +111,7 @@ def scraping_and_causal_analysis_test():
         print(f'\n-------- {row["title"]} --------\n')
         nodes, edges, cycles = gpt.causal_discovery_pipeline(row['title'], row['abstract'], use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, optimize_found_entities=True, use_text_in_entity_optimization=True, search_cycles=True, plot_graphs=False, plot_interactive_graph=True, verbose=False)
         new_row = pd.DataFrame({'id': row['id'], 'title': row['title'], 'abstract': row['abstract'], 'keywords': row['keywords'], 'nodes': [nodes], 'edges': [edges], 'cycles': [cycles]}, index=[0])
-	    results = pd.concat([results, new_row]).reset_index(drop=True)
+        results = pd.concat([results, new_row]).reset_index(drop=True)
 
         results.to_csv(file_name, index=False)
 
@@ -122,18 +134,13 @@ def smoking_test():
 
         # print(row['title'])
         print(f'\n-------- {row["title"]} --------\n')
-        nodes, edges, cycles = gpt_Copia.causal_discovery_pipeline(row['title'], row['abstract'], use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, optimize_found_entities=True, use_text_in_entity_optimization=True, search_cycles=True, plot_graphs=False, plot_interactive_graph=True, verbose=False)
+        nodes, edges, cycles = gpt.causal_discovery_pipeline(row['title'], row['abstract'], use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, optimize_found_entities=True, use_text_in_entity_optimization=True, search_cycles=True, plot_graphs=False, plot_interactive_graph=True, verbose=False)
         graph_results = pd.concat([graph_results, pd.DataFrame({
             'article_id': row['article_id'], 'title': row['title'], 'abstract': row['abstract'], 'keywords': row['keywords'], 'nodes': [nodes], 'edges': [edges], 'cycles': [cycles]
             }, index=[0])]).reset_index(drop=True)
         
     
     graph_results.to_csv(f'../data/graphs/causal_analysis_results{time.time().as_integer_ratio()[0]}.csv', index=False)
-
-
-def ciao():
-    print("CIAO FUNCTION")
-    # sys.stdout.flush()
 
 def main():
     args = sys.argv[1:]  # Exclude the script name
