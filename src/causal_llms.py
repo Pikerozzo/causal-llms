@@ -6,6 +6,7 @@ import pandas as pd
 import re
 import time
 from datetime import datetime
+import benchmarks
 
 import json
 
@@ -17,7 +18,8 @@ def sanitize_string(string):
 
 
 def causal_analysis(data, file_name=None, use_short_abstracts=False, max_abstract_length=200):
-    
+    print(data)
+    return 
     print(f'Starting at : {datetime.now().strftime("%H:%M:%S %d/%m/%Y")}')
 
     if file_name:
@@ -29,6 +31,8 @@ def causal_analysis(data, file_name=None, use_short_abstracts=False, max_abstrac
     file_name = f'{directory}/{file_name}'
     graphs_directory = f'{directory}/graphs'
     os.makedirs(directory, exist_ok=True)
+    os.makedirs(graphs_directory, exist_ok=True)
+
 
     results = pd.DataFrame(columns=['id', 'title', 'abstract'])
 
@@ -46,7 +50,6 @@ def causal_analysis(data, file_name=None, use_short_abstracts=False, max_abstrac
 
 
         print(f'\n-------- {row["title"]} --------\n')
-        # nodes, edges, cycles = gpt.causal_discovery_pipeline(article_ref, row['abstract'], use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, optimize_found_entities=True, use_text_in_entity_optimization=True, search_cycles=True, plot_graphs=False, plot_interactive_graph=True, graph_directory_name=graphs_directory, verbose=False)
         nodes, edges, cycles = gpt.causal_discovery_pipeline(article_ref, row['abstract'], use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, optimize_found_entities=True, use_text_in_entity_optimization=True, search_cycles=True, plot_static_graph=False, graph_directory_name=graphs_directory, verbose=False)
         new_row = pd.DataFrame({'id': row['id'], 'title': row['title'], 'abstract': row['abstract']}, index=[0])
         results = pd.concat([results, new_row]).reset_index(drop=True)
@@ -66,16 +69,26 @@ def causal_analysis(data, file_name=None, use_short_abstracts=False, max_abstrac
 def causal_analysis_test():
     df = pd.read_csv('../data/dummy_data.csv')
 
+    #df = pd.read_csv('../data/cycles_test.csv')
+
     df = pd.read_csv('../data/pubmed_data.csv')
-    df = df.sample(50)
+    df = df.sample(5)
     # df = df.loc[df['abstract'].apply(lambda x: len(x.split())).sort_values().head(5)]
 
     causal_analysis(df)
 
 
+def pubmed_scraping():
+    print('SCRAPING PROCESS')
+    print('------------------\n')
+
+    scraping.main()
 
 
 def scraping_and_causal_analysis():
+    print('SCRAPING PROCESS AND CAUSAL ANALYSIS')
+    print('------------------\n')
+
     data = scraping.main(return_data=True)
     if data is None:
         print('ERROR: No data')
@@ -85,137 +98,92 @@ def scraping_and_causal_analysis():
 
 
 
+def run_benchmarks():
+    print('BENCHMARKS')
+    print('------------------\n')
+
+    benchmarks.run_benchmarks()
+
+
 
     
 #     # TODO - add command line parameters for operations
     
 
 
-def scraping_and_causal_analysis_test():
-    print('CAUSAL ANALYSIS TEST FROM SAVED DATA')
 
-    data = pd.read_csv('../data/script_test.csv')
-    if data is None:
-        print('ERROR: No data')
-        sys.exit()
+def run_example_test():
+    print('EXAMPLE TEST')
+    print('------------------\n')
 
-    file_name = f'../data/graphs/causal_analysis_results{time.time().as_integer_ratio()[0]}.csv'
-    results = pd.DataFrame(columns=['id', 'title', 'abstract', 'keywords', 'nodes', 'edges', 'cycles'])
+    gpt.example_test()
 
-    for row in data.iterrows():
-        row = row[1]
-        if len(row['abstract'].split(' ')) > 200:
-            continue
 
-        # id,title,abstract,keywords,pub_date,search_terms
-        print(f'\n-------- {row["title"]} --------\n')
-        nodes, edges, cycles = gpt.causal_discovery_pipeline(row['title'], row['abstract'], use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, optimize_found_entities=True, use_text_in_entity_optimization=True, search_cycles=True, plot_graphs=False, plot_interactive_graph=True, verbose=False)
-        new_row = pd.DataFrame({'id': row['id'], 'title': row['title'], 'abstract': row['abstract'], 'keywords': row['keywords'], 'nodes': [nodes], 'edges': [edges], 'cycles': [cycles]}, index=[0])
-        results = pd.concat([results, new_row]).reset_index(drop=True)
-
-        results.to_csv(file_name, index=False)
-
-    results.to_csv(file_name, index=False)
-
-def smoking_test():
-    print('smoking test FROM SAVED DATA')
-
-    data = pd.read_csv('../data/dummy_data.csv')
-    if data is None:
-        print('ERROR: No data')
-        sys.exit()
-
-    graph_results = pd.DataFrame(columns=['article_id', 'title', 'abstract', 'keywords', 'nodes', 'edges', 'cycles'])
-
-    for row in data.iterrows():
-        row = row[1]
-        if len(row['abstract'].split(' ')) > 200:
-            continue
-
-        # print(row['title'])
-        print(f'\n-------- {row["title"]} --------\n')
-        nodes, edges, cycles = gpt.causal_discovery_pipeline(row['title'], row['abstract'], use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, optimize_found_entities=True, use_text_in_entity_optimization=True, search_cycles=True, plot_graphs=False, plot_interactive_graph=True, verbose=False)
-        graph_results = pd.concat([graph_results, pd.DataFrame({
-            'article_id': row['article_id'], 'title': row['title'], 'abstract': row['abstract'], 'keywords': row['keywords'], 'nodes': [nodes], 'edges': [edges], 'cycles': [cycles]
-            }, index=[0])]).reset_index(drop=True)
-        
-    
-    graph_results.to_csv(f'../data/graphs/causal_analysis_results{time.time().as_integer_ratio()[0]}.csv', index=False)
 
 def main():
-    args = sys.argv[1:]  # Exclude the script name
-    # print("Command line arguments:", args)
-
-    # smoking_test()
-    causal_analysis_test()
-    # scraping_and_causal_analysis_test()
-    # scraping_and_causal_analysis()
-
-    # while True:
-    #     print(f'''
-    # Enter operation: 
-    #         test(/t)
-    #         scraping(/s)
-    #         causal analysis(/c)
-    #         scraping + causal analysis(/sc)''')
-    #     term = input()
-
-    #     if term == 't' or term == 'test':
-    #         print('test')
-    #         break
-    #     elif term == 's' or term == 'scraping':
-    #         print('scraping')
-    #         break
-    #     elif term == 'c' or term == 'causal analysis':
-    #         print('causal analysis')
-    #         break
-    #     elif term == 'sc' or term == 'scraping + causal analysis':
-    #         print('scraping + causal analysis')
-    #         break
-    #         break
-    #     elif term == 'ciao':
-    #         ciao()
-    #         break
-    #     else:
-    #         print('ERROR: Invalid input')
 
 
 
-    # parser = argparse.ArgumentParser(description="Call a specific method from the script.")
-    # parser.add_argument("method", choices=["ciao"], help="Method to call")
-    # parser.add_argument("--arg1", required=False, help="Argument 1")
-    # parser.add_argument("--arg2", required=False, help="Argument 2")
-    # args = parser.parse_args()
+    # causal_analysis_test()
 
-    # if args.method == "ciao":
-    #     ciao()
 
-def handle_help(): # TODO - add instructions for each command line parameter
-    print("Usage: python your_script.py [options]")
-    print("Options:")
-    print("  --help: Show this help message")
-    print("  --custom-option: Perform a custom action")
+    custom_help = """
+Usage: script.py <action> [options]
+
+Description:
+  This script performs various tasks related to data analysis.
+
+Actions:
+  ex       Run the example test.
+  s        Run the scraping process.
+  c        Perform causal analysis.
+  sc       Run scraping and causal analysis.
+
+Options:
+  --help   Show this help message and exit.
+
+Examples:
+  python script.py ex                               # Run the example test.
+  python script.py b                                # Run the benchmarks test.
+  python script.py s                                # Run the scraping process.
+  python script.py c --data-path /path/to/data      # Perform causal analysis with specified data path.
+  python script.py sc                               # Run scraping and causal analysis.
+    """
+
+    # Create an ArgumentParser object
+    parser = argparse.ArgumentParser(description=custom_help,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+
+    # Add command line arguments
+    # parser.add_argument("action", choices=["b","ex", "s", "c", "sc"], help="Action to perform.")
+
+    # parser.add_argument("--data-path", help="Path to the data for causal analysis.")
+
+
+    try:
+        # Parse the command line arguments
+        args = parser.parse_args()
+
+        # Check and use the parsed action
+        if args.action == "b":
+            run_benchmarks()
+        if args.action == "ex":
+            run_example_test()
+        elif args.action == "s":
+            pubmed_scraping()
+        elif args.action == "c":
+            if args.data_path:
+                causal_analysis(args.data_path)
+            else:
+                print("Please provide the path to the data for causal analysis using the --data-path option.")
+            # causal_analysis()
+        elif args.action == "sc":
+            scraping_and_causal_analysis()
+        else:
+            raise argparse.ArgumentError
+    except argparse.ArgumentError:
+        print("Invalid action. Use --help for available options.")
 
 
 if __name__ == "__main__":
-    
     main()
-    
-    # args = sys.argv[1:]  # Exclude the script name
-    # # print("Command line arguments:", args)
-    # if len(args) == 0:
-    #     handle_help()
-    #     sys.exit(0)
-
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument("--help", action="store_true", help="Show help message")
-    # parser.add_argument("--custom-option", action="store_true", help="Perform custom action")
-
-    # args = parser.parse_args()
-
-    # if args.help:
-    #     handle_help()
-    # elif args.custom_option:
-    #     print("Custom action performed.")
-    # else:
-    #     main()

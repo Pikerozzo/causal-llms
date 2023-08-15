@@ -496,7 +496,7 @@ def preprocess_edges(edges):
     return nodes, processed_edges, bidirected_edges, graph
 
 
-def find_cycles(nodes=[], edges=[]):
+def find_cycles(nodes=[], edges=[], return_first_100_cycles=True):
     if not nodes or not edges:
         return []
 
@@ -514,7 +514,9 @@ def find_cycles(nodes=[], edges=[]):
         e = g.add_edge(nodes_ids[n1], nodes_ids[n2])
 
     cycles = []
-    for c in gt.all_circuits(g):
+    for i, c in enumerate(gt.all_circuits(g)):
+        if return_first_100_cycles and i >= 100:
+            break
         cycles.append([v_prop[v] for v in c])
 
     return cycles
@@ -667,7 +669,7 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_text_in_causal_
 
 
 # Sample text for test
-def smoking_test():
+def example_test():
     text = 'Smoking involves inhaling tobacco fumes and it causes lung cancer and tumors.'
     text_title = 'Smoking - test'
     return causal_discovery_pipeline(text_title, text, use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, optimize_found_entities=True, use_text_in_entity_optimization=True, search_cycles=True, plot_graphs=False, plot_interactive_graph=False, verbose=True)
