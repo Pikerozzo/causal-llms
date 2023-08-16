@@ -1,0 +1,35 @@
+{
+    "nodes": [
+        [
+            "lack of exercise",
+            "body weight",
+            "diabetes",
+            "diet"
+        ]
+    ],
+    "edges": [
+        [
+            [
+                "lack of exercise",
+                "diabetes"
+            ],
+            [
+                "diabetes",
+                "body weight"
+            ],
+            [
+                "diet",
+                "body weight"
+            ],
+            [
+                "diabetes",
+                "diet"
+            ],
+            [
+                "diet",
+                "diabetes"
+            ]
+        ]
+    ],
+    "cycles": []
+}

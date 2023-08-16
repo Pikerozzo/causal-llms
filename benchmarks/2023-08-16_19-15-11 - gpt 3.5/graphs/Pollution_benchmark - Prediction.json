@@ -1,0 +1,44 @@
+{
+    "nodes": [
+        [
+            "pollution",
+            "cigarette smoking",
+            "lung cancer",
+            "dyspnoea",
+            "positive X-ray"
+        ]
+    ],
+    "edges": [
+        [
+            [
+                "pollution",
+                "dyspnoea"
+            ],
+            [
+                "cigarette smoking",
+                "lung cancer"
+            ],
+            [
+                "cigarette smoking",
+                "dyspnoea"
+            ],
+            [
+                "cigarette smoking",
+                "positive X-ray"
+            ],
+            [
+                "lung cancer",
+                "positive X-ray"
+            ],
+            [
+                "lung cancer",
+                "dyspnoea"
+            ],
+            [
+                "dyspnoea",
+                "lung cancer"
+            ]
+        ]
+    ],
+    "cycles": []
+}

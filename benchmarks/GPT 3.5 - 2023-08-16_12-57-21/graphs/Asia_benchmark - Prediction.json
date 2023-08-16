@@ -1,0 +1,74 @@
+{
+    "nodes": [
+        [
+            "visit to Asia",
+            "tubercolosis",
+            "lung cancer",
+            "bronchitis",
+            "dyspnoea",
+            "smoking",
+            "positive X-ray"
+        ]
+    ],
+    "edges": [
+        [
+            [
+                "tubercolosis",
+                "dyspnoea"
+            ],
+            [
+                "tubercolosis",
+                "positive X-ray"
+            ],
+            [
+                "lung cancer",
+                "dyspnoea"
+            ],
+            [
+                "smoking",
+                "lung cancer"
+            ],
+            [
+                "lung cancer",
+                "positive X-ray"
+            ],
+            [
+                "bronchitis",
+                "dyspnoea"
+            ],
+            [
+                "smoking",
+                "bronchitis"
+            ],
+            [
+                "smoking",
+                "dyspnoea"
+            ],
+            [
+                "visit to Asia",
+                "dyspnoea"
+            ],
+            [
+                "dyspnoea",
+                "visit to Asia"
+            ],
+            [
+                "lung cancer",
+                "bronchitis"
+            ],
+            [
+                "bronchitis",
+                "lung cancer"
+            ],
+            [
+                "bronchitis",
+                "positive X-ray"
+            ],
+            [
+                "positive X-ray",
+                "bronchitis"
+            ]
+        ]
+    ],
+    "cycles": []
+}

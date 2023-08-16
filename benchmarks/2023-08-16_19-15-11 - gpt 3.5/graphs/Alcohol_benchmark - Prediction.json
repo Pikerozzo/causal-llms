@@ -1,0 +1,18 @@
+{
+    "nodes": [
+        [
+            "alcohol",
+            "liver cirrhosis",
+            "death"
+        ]
+    ],
+    "edges": [
+        [
+            [
+                "alcohol",
+                "liver cirrhosis"
+            ]
+        ]
+    ],
+    "cycles": []
+}

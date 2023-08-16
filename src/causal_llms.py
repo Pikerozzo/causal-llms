@@ -13,13 +13,15 @@ import json
 import os
 
 
-def sanitize_string(string):
-    return re.sub(r'[\\/:*?"<>|]', '_', string)
+def sanitize_string(string, max_length=100):
+    string = re.sub(r'[\\/:*?"<>|]', '_', string)
+    return string[:max_length] if max_length else string
 
 
 def causal_analysis(data, file_name=None, use_short_abstracts=False, max_abstract_length=200):
-    print(data)
-    return 
+
+    print('CAUSAL ANALYSIS PROCESS')
+
     print(f'Starting at : {datetime.now().strftime("%H:%M:%S %d/%m/%Y")}')
 
     if file_name:
@@ -43,10 +45,8 @@ def causal_analysis(data, file_name=None, use_short_abstracts=False, max_abstrac
         if use_short_abstracts and len(row['abstract'].split(' ')) > max_abstract_length:
             continue
 
-        title = sanitize_string(row['title'])
-        max_title_length = 35
-        tunc_title = title[:max_title_length] + (title[max_title_length:] and '..')
-        article_ref = f'{row["id"]}-{tunc_title}'
+        title = sanitize_string(row['title'], 35)
+        article_ref = f'{row["id"]}-{title}'
 
 
         print(f'\n-------- {row["title"]} --------\n')
@@ -86,9 +86,6 @@ def pubmed_scraping():
 
 
 def scraping_and_causal_analysis():
-    print('SCRAPING PROCESS AND CAUSAL ANALYSIS')
-    print('------------------\n')
-
     data = scraping.main(return_data=True)
     if data is None:
         print('ERROR: No data')
@@ -98,17 +95,12 @@ def scraping_and_causal_analysis():
 
 
 
-def run_benchmarks():
+def run_benchmarks(model=benchmarks.Algorithm.GPT):
     print('BENCHMARKS')
     print('------------------\n')
 
-    benchmarks.run_benchmarks()
+    benchmarks.run_benchmarks(model)
 
-
-
-    
-#     # TODO - add command line parameters for operations
-    
 
 
 
@@ -144,7 +136,7 @@ Options:
 
 Examples:
   python script.py ex                               # Run the example test.
-  python script.py b                                # Run the benchmarks test.
+  python script.py b --algorithm alg_to_use         # Run the benchmarks test.
   python script.py s                                # Run the scraping process.
   python script.py c --data-path /path/to/data      # Perform causal analysis with specified data path.
   python script.py sc                               # Run scraping and causal analysis.
@@ -155,9 +147,10 @@ Examples:
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
 
     # Add command line arguments
-    # parser.add_argument("action", choices=["b","ex", "s", "c", "sc"], help="Action to perform.")
+    parser.add_argument("action", choices=["b","ex", "s", "c", "sc"], help="Action to perform.")
 
-    # parser.add_argument("--data-path", help="Path to the data for causal analysis.")
+    parser.add_argument("--data-path", help="Path to the data for causal analysis.")
+    parser.add_argument("--algorithm", help="Algorithm to use for the benchmark.")
 
 
     try:
@@ -166,14 +159,39 @@ Examples:
 
         # Check and use the parsed action
         if args.action == "b":
-            run_benchmarks()
-        if args.action == "ex":
+            if args.algorithm.upper() in [attr for attr in dir(benchmarks.Algorithm) if attr.isupper()]:
+                run_benchmarks(model=args.algorithm.upper())
+            else:
+                run_benchmarks()
+        elif args.action == "ex":
             run_example_test()
         elif args.action == "s":
             pubmed_scraping()
         elif args.action == "c":
             if args.data_path:
-                causal_analysis(args.data_path)
+                data = None
+                try:
+                    data = pd.read_csv(args.data_path)
+                except FileNotFoundError:
+                    print(f"CSV file not found: {args.data_path}")
+                    return
+                except pd.errors.ParserError:
+                    print(f"Error parsing CSV file: {args.data_path}")
+                    return
+                except pd.errors.EmptyDataError:
+                    print(f"CSV file is empty: {args.data_path}")
+                    return
+                except UnicodeDecodeError:
+                    print(f"Error decoding CSV file: {args.data_path}")
+                    return
+                except PermissionError:
+                    print(f"Permission error: {args.data_path}")
+                    return
+                except IOError:
+                    print(f"I/O error: {args.data_path}")
+                    return
+
+                causal_analysis(data)
             else:
                 print("Please provide the path to the data for causal analysis using the --data-path option.")
             # causal_analysis()
