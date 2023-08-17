@@ -1,0 +1,27 @@
+{
+    "nodes": [
+        [
+            "obesity",
+            "mortality",
+            "heart failure",
+            "heart defects"
+        ]
+    ],
+    "edges": [
+        [
+            [
+                "obesity",
+                "heart failure"
+            ],
+            [
+                "heart failure",
+                "mortality"
+            ],
+            [
+                "heart defects",
+                "mortality"
+            ]
+        ]
+    ],
+    "cycles": []
+}

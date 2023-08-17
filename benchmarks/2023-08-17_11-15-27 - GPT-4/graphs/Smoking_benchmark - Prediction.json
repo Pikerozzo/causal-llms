@@ -1,0 +1,39 @@
+{
+    "nodes": [
+        [
+            "smoking",
+            "tobacco fumes",
+            "lung cancer",
+            "tumors"
+        ]
+    ],
+    "edges": [
+        [
+            [
+                "smoking",
+                "tobacco fumes"
+            ],
+            [
+                "smoking",
+                "lung cancer"
+            ],
+            [
+                "smoking",
+                "tumors"
+            ],
+            [
+                "tobacco fumes",
+                "lung cancer"
+            ],
+            [
+                "tobacco fumes",
+                "tumors"
+            ],
+            [
+                "lung cancer",
+                "tumors"
+            ]
+        ]
+    ],
+    "cycles": []
+}

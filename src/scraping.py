@@ -198,7 +198,7 @@ def main(return_data=True):
             # print('Enter file name:')
             # file_name = input()
             # file_name = file_name.replace(' ', '_')
-            file_name = 'data'
+            file_name = f'data - {datetime.now().strftime("%H:%M:%S %d/%m/%Y")}'
             data = data_extraction_pipeline(terms=terms, n_articles=n_articles, file_name=file_name)
             break
         elif save == 'n':
