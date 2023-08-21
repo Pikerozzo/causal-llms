@@ -42,11 +42,20 @@ def search_by_terms(terms, db='pubmed', retmax=1000, use_history=True):
     
     terms_string = '+AND+'.join([s.strip().replace(' ', '+') for s in terms])
 
-    url = f'{base_url}esearch.fcgi?db={db}&term={terms_string}&retmax={retmax}&api_key={api_key}'
-    if use_history:
-        url += '&usehistory=y'
+    url_params = {
+            'db': db,
+            'term': terms_string,
+            'retmax': retmax,
+            'api_key': api_key,
+        }
 
-    response = requests.get(url)
+    if use_history:
+        url_params['usehistory'] = 'y'
+
+    url = f'{base_url}esearch.fcgi'
+    response = requests.get(url, params=url_params)
+
+
     if response.status_code != 200:
         print('ERROR: Bad response code')
         if use_history:
@@ -70,29 +79,35 @@ def search_by_terms(terms, db='pubmed', retmax=1000, use_history=True):
 
 def get_articles_data(ids=[], web_env='', query_key='', db='pubmed', retmax=1000):
 
-    use_web_env = False
-
     if not ids and not (query_key and web_env):
         print('ERROR: No ids or query_key/web_env provided')
         return None
-    elif not ids:
-        use_web_env = True 
+    
+    use_web_env = not ids
 
-    url = f'{base_url}efetch.fcgi?db={db}'
+    url_params = {
+        'db': db,
+        'rettype': 'abstract',
+        'retmode': 'xml',
+        'api_key': api_key,
+        'retmax': retmax,
+    }
+
     if use_web_env:
-        url += f'&query_key={query_key}&WebEnv={web_env}'
+        url_params['query_key'] = query_key
+        url_params['WebEnv'] = web_env
     else:
-        ids_string = [str(id) for id in ids]
-        url += '&id=' + ','.join(ids_string)
+        ids_string = ','.join(map(str, ids))
+        url_params['id'] = ids_string
 
-    url += f'&rettype=abstract&retmode=xml&api_key={api_key}&retmax={retmax}'
+    url = f'{base_url}efetch.fcgi'
+    response = requests.get(url, params=url_params)
 
-    response = requests.get(url)
 
     if response.status_code != 200:
         print('ERROR: Bad response code')
         return None
-    
+
     soup = BeautifulSoup(response.text, features="xml")
     articles = soup.find_all('PubmedArticle')
     if not articles:
@@ -101,15 +116,17 @@ def get_articles_data(ids=[], web_env='', query_key='', db='pubmed', retmax=1000
     
     data = pd.DataFrame(columns=['id', 'title', 'abstract', 'keywords', 'pub_date'])
     for article in articles:
-        id = article.find('PMID').get_text()
-        date = article.find('PubMedPubDate', {'PubStatus': 'received'})
-        pub_date = None
-        if date:
-            pub_date = datetime.strptime(f'{date.find("Day").get_text()} {date.find("Month").get_text()} {date.find("Year").get_text()}', "%d %m %Y")
-        title = article.find('ArticleTitle').get_text()
-        abstract = ''.join([a.get_text() for a in article.find_all('AbstractText')])
-        keywords = [k.get_text() for k in article.find_all('Keyword')]
-        data = pd.concat([data, pd.DataFrame({'id': id, 'title': title, 'abstract': abstract, 'keywords': [keywords], 'pub_date': pub_date})]).reset_index(drop=True)
+        article_data = {
+            'id': article.find('PMID').get_text(),
+            'title': article.find('ArticleTitle').get_text(),
+            'abstract': ' '.join([a.get_text() for a in article.find_all('AbstractText')]),
+            'keywords': [[k.get_text() for k in article.find_all('Keyword')]],
+        }
+        pub_date = article.find('PubMedPubDate', {'PubStatus': 'received'})
+        if pub_date:
+            article_data['pub_date'] = datetime.strptime(f"{pub_date.find('Day').get_text()} {pub_date.find('Month').get_text()} {pub_date.find('Year').get_text()}", "%d %m %Y")
+        
+        data = pd.concat([data, pd.DataFrame(article_data)]).reset_index(drop=True)
 
     return data
 
@@ -120,29 +137,26 @@ def clean_data(data, drop_id_duplicates=True, drop_empty_abstracts=True, drop_na
         return None
 
     if drop_id_duplicates:
-        data = data.drop_duplicates(subset=['id']).reset_index(drop=True)
-
+        data = data.drop_duplicates(subset=['id'], inplace=False)
     if drop_empty_abstracts:
-        data = data.loc[data['abstract'] != ''].reset_index(drop=True)
-
+        data = data[data['abstract'] != '']
     if drop_nan_abstracts:
-        data = data.dropna(subset=['abstract']).reset_index(drop=True)
-    
+        data = data.dropna(subset=['abstract'])
     if drop_abstracts_with_matches and drop_abstracts_matches:
-        data = data.loc[~data['abstract'].str.startswith(tuple(drop_abstracts_matches))].reset_index(drop=True)  
+        data = data[~data['abstract'].str.startswith(tuple(drop_abstracts_matches))]
 
     if drop_date_nan:
-        data = data.dropna(subset=['pub_date']).reset_index(drop=True)
+        data = data.dropna(subset=['pub_date'])
 
     if drop_date_before:
-        data = data.loc[data['pub_date'] > drop_date_before].reset_index(drop=True)
+        data = data[data['pub_date'] > drop_date_before]
     if drop_date_after:
-        data = data.loc[data['pub_date'] < drop_date_after].reset_index(drop=True)
-    
+        data = data[data['pub_date'] < drop_date_after]
+
     if search_terms:
         data['search_terms'] = [search_terms]*len(data)
-        
-    return data
+
+    return data.reset_index(drop=True)
 
 
 def data_extraction_pipeline(terms, db='pubmed', n_articles=1000, use_history=True, drop_id_duplicates=True, drop_empty_abstracts=True, drop_nan_abstracts=True, drop_abstracts_with_matches=True, drop_abstracts_matches=['[This corrects the article DOI: ', '[This retracts the article DOI: '], drop_date_nan=False, drop_date_before=None, drop_date_after=None, add_search_terms=True, file_name=None):
@@ -198,7 +212,7 @@ def main(return_data=True):
             # print('Enter file name:')
             # file_name = input()
             # file_name = file_name.replace(' ', '_')
-            file_name = f'data - {datetime.now().strftime("%H:%M:%S %d/%m/%Y")}'
+            file_name = f'data - {datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}'
             data = data_extraction_pipeline(terms=terms, n_articles=n_articles, file_name=file_name)
             break
         elif save == 'n':

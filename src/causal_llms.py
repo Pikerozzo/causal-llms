@@ -120,26 +120,32 @@ def main():
 
 
     custom_help = """
-Usage: script.py <action> [options]
+Usage: causal_llms.py <action> [options]
 
 Description:
-  This script performs various tasks related to data analysis.
+  This script performs various tasks related to causal discovery.
 
 Actions:
   ex       Run the example test.
   s        Run the scraping process.
   c        Perform causal analysis.
   sc       Run scraping and causal analysis.
+  b        Run the benchmark tests.
 
 Options:
   --help   Show this help message and exit.
 
 Examples:
-  python script.py ex                               # Run the example test.
-  python script.py b --algorithm alg_to_use         # Run the benchmarks test.
-  python script.py s                                # Run the scraping process.
-  python script.py c --data-path /path/to/data      # Perform causal analysis with specified data path.
-  python script.py sc                               # Run scraping and causal analysis.
+  python causal_llms.py ex                               # Run the example test.
+  python causal_llms.py b --algorithm {b|gpt}            # Run the benchmark tests with the specified algorithm.
+  python causal_llms.py s                                # Run the scraping process.
+  python causal_llms.py c --data-path </path/to/data>    # Perform causal analysis with specified data path.
+  python causal_llms.py sc                               # Run scraping and causal analysis.
+
+The `algorithm` parameter specifies the algorithm to use for the benchmark tests.
+The possible values are:
+* `b`: Baseline algorithm
+* `gpt`: GPT algorithm
     """
 
     # Create an ArgumentParser object

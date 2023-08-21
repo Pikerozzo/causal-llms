@@ -57,15 +57,15 @@ if use_gpt_4 and gpt_4 in model_ids:
 default_model
 
 
-def gpt_request(system_msg, user_msg, model=default_model, temperature=0):
+def gpt_request(system_msg, user_msg, model=default_model, temperature=0.3):
     if not system_msg or not user_msg:
         return None
     try:
         response = openai.ChatCompletion.create(model=model,
-                                            messages=[
-                                                {"role": "system", "content": system_msg},
-                                                {"role": "user", "content": user_msg}], 
-                                            temperature=temperature)
+                            messages=[
+                                {"role": "system", "content": system_msg},
+                                {"role": "user", "content": user_msg}], 
+                            temperature=temperature)
         return response.choices[0].message.content
     except:
         return None
@@ -456,44 +456,35 @@ Then provide your final answer within the tags <Answer>[answer]</Answer>, (e.g. 
     return graph_edges
 
 
-def normalize_edge_direction(e1, e2, answer, graph):
+def normalize_edge_direction(e1, e2, answer):
     if answer in arrows:
         if arrows[answer] == forward_arrow:
-            graph[e1].append(e2)
             return [(e1, e2)]
         elif arrows[answer] == backward_arrow:
-            graph[e2].append(e1)   
             return [(e2, e1)]
         elif arrows[answer] == bidirectional_arrow:
-            return [(e1, e2), (e2, e1)]
-        else: 
-            return None
-    else: 
-        return None
+            return [(e2, e1), (e1, e2)]
+    return None
 
 
 def preprocess_edges(edges):
-    graph = {}
-    processed_edges = []
+    nodes = set()
+    directed_edges = []
     bidirected_edges = []
 
     for (n1, n2), answer in edges:
 
-        if n1 not in graph:
-            graph[n1] = []
-        if n2 not in graph:
-            graph[n2] = []
+        nodes.add(n1)
+        nodes.add(n2)
             
-        direction = normalize_edge_direction(n1, n2, answer, graph)
+        direction = normalize_edge_direction(n1, n2, answer)
         if direction:
             if len(direction) == 2:
                 bidirected_edges.extend(direction)
             else:
-                processed_edges.extend(direction)
+                directed_edges.extend(direction)
 
-    nodes = list(graph.keys())
-
-    return nodes, processed_edges, bidirected_edges, graph
+    return list(nodes), directed_edges, bidirected_edges
 
 
 def find_cycles(nodes=[], edges=[], return_first_100_cycles=True):
@@ -539,11 +530,6 @@ def build_graph(nodes, edges=[], bidirected_edges=[], cycles=[], plot_static_gra
             G[cycle[i]][cycle[i + 1]]['color'] = 'red'
         G[cycle[-1]][cycle[0]]['color'] = 'red'
 
-            # cycle_edges = [(cycle[i], cycle[i + 1]) for i in range(len(cycle) - 1)]
-            # cycle_edges.append((cycle[-1], cycle[0]))
-            # cycles_edges.append(cycle_edges)
-
-    
     for e1, e2 in bidirected_edges:
         G.add_edge(e1, e2, color='grey', style='dashed')
 
@@ -633,7 +619,7 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_text_in_causal_
         
         print('EDGE CORRECTION DONE')
     
-    nodes, processed_edges, bidirected_edges, graph = preprocess_edges(edges)
+    nodes, processed_edges, bidirected_edges = preprocess_edges(edges)
 
     if verbose:
         print('Nodes:')
@@ -645,11 +631,7 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_text_in_causal_
 
     cycles = []
     if search_cycles:
-        start = time.time()
-        print(f'Looking for cycles... {datetime.now().strftime("%H:%M:%S %d/%m/%Y")}')
         cycles = find_cycles(nodes=nodes, edges=processed_edges)
-        elapsed_seconds = time.time() - start
-        print(f'{len(cycles)} cycles found - exec time : {time.strftime("%H:%M:%S", time.gmtime(elapsed_seconds))}')
     build_graph(nodes=nodes, edges=processed_edges, bidirected_edges=bidirected_edges, cycles=cycles, plot_static_graph=plot_static_graph, directory_name=graph_directory_name, graph_name=text_title)
     
     if verbose:
