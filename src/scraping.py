@@ -5,7 +5,7 @@ import subprocess
 import pkgutil
 
 packages_to_install = [
-    'python-dotenv', 'numpy', 'python-dotenv', 'pandas', 'matplotlib', 'requests', 'bs4', 'lxml'
+    'numpy', 'python-dotenv', 'pandas', 'matplotlib', 'requests', 'bs4', 'lxml'
 ]
 
 for package in packages_to_install:
@@ -24,12 +24,9 @@ import os
 from dotenv import load_dotenv, find_dotenv
 
 
-
 base_url = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/'
-
 _ = load_dotenv(find_dotenv())
 api_key  = os.getenv('PUBMED_API_KEY')
-
 
 
 def search_by_terms(terms, db='pubmed', retmax=1000, use_history=True):
@@ -74,7 +71,6 @@ def search_by_terms(terms, db='pubmed', retmax=1000, use_history=True):
         return ids, web, key
 
     return ids
-
 
 
 def get_articles_data(ids=[], web_env='', query_key='', db='pubmed', retmax=1000):
@@ -220,7 +216,6 @@ def main(return_data=True):
             break
     if return_data:
         return data
-
 
 
 if __name__ == "__main__":

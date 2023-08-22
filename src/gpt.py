@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import datetime
 import subprocess
 import pkgutil
 
@@ -54,10 +53,8 @@ use_gpt_4 = True
 if use_gpt_4 and gpt_4 in model_ids:
     default_model = gpt_4
 
-default_model
 
-
-def gpt_request(system_msg, user_msg, model=default_model, temperature=0.3):
+def gpt_request(system_msg, user_msg, model=default_model, temperature=0.2):
     if not system_msg or not user_msg:
         return None
     try:
@@ -107,11 +104,10 @@ def gpt_ner(text):
 
 def pick_random_causal_verb():
     verbs = ['provokes', 'triggers', 'causes', 'leads to', 'induces', 'results in', 'generates', 'produces', 'stimulates', 'instigates', 'engenders', 'promotes', 'gives rise to', 'sparks']
-    # return 'causes'
     return random.choice(verbs)
 
 
-def gpt_causal_discovery(entities, text=None, use_pretrained_knowledge=False, reverse_variable_check=False, verbose=False):
+def gpt_causal_discovery(entities, text=None, use_pretrained_knowledge=False, reverse_variable_check=False):
 
     graph_edges = []    
 
@@ -153,9 +149,6 @@ Then provide your final answer within the tags <Answer>[answer]</Answer>, (e.g. 
             if i1 == i2 or (not reverse_variable_check and i1 >= i2):
                 continue
 
-            if verbose:
-                print(f'{i1} = {e1}, {i2} = {e2}') # TODO remove
-
             options_with_random_verb = f'''\
             Options:
             A: "{e1}" {pick_random_causal_verb()} "{e2}"; 
@@ -181,10 +174,6 @@ Then provide your final answer within the tags <Answer>[answer]</Answer>, (e.g. 
             if response:
                 graph_edges.append(((e1, e2), response))
             
-                if verbose:
-                    print(graph_edges[-1]) # TODO remove
-                    print('----------------------------------')
-            
             progress_bar.update(1)
 
     progress_bar.close()
@@ -203,7 +192,7 @@ bidirectional_arrow_answer = 'D'
 
 arrows = {forward_arrow_answer:forward_arrow, backward_arrow_answer:backward_arrow, no_arrow_answer:no_arrow, bidirectional_arrow_answer:bidirectional_arrow}
 
-answer_pattern = re.compile(r'^([A-Z])\.')
+answer_pattern = re.compile(r'^([A-Z])[.:]')
 
 def get_edge_answer(text):
     soup = BeautifulSoup(text, 'html.parser')
@@ -306,7 +295,6 @@ After you have finished building the JSON object, check and make sure that every
     return entities
 
 
-answer_pattern = re.compile(r'^([A-Z])[.:]')
 
 def extract_edge_answers(edges):
     edges_with_answers = []
@@ -331,9 +319,9 @@ def extract_edge_answers(edges):
 
     return edges_with_answers
 
-
+coherent_answers = [(forward_arrow, backward_arrow), (backward_arrow, forward_arrow), (no_arrow, no_arrow), (bidirectional_arrow, bidirectional_arrow)]
 def check_edge_compatibility(answer1, answer2):
-    return (arrows[answer1], arrows[answer2]) in [(forward_arrow, backward_arrow), (backward_arrow, forward_arrow), (no_arrow, no_arrow), (bidirectional_arrow, bidirectional_arrow)]
+    return (arrows[answer1], arrows[answer2]) in coherent_answers
 
 def check_invalid_answers(directed_edges):
     invalid_edges = []
@@ -473,7 +461,6 @@ def preprocess_edges(edges):
     bidirected_edges = []
 
     for (n1, n2), answer in edges:
-
         nodes.add(n1)
         nodes.add(n2)
             
@@ -500,7 +487,6 @@ def find_cycles(nodes=[], edges=[], return_first_100_cycles=True):
         v_prop[v] = n
         nodes_ids[n] = v
 
-    # e_prop = g.new_edge_property("string")
     for (n1, n2) in edges:
         e = g.add_edge(nodes_ids[n1], nodes_ids[n2])
 
@@ -524,7 +510,6 @@ def build_graph(nodes, edges=[], bidirected_edges=[], cycles=[], plot_static_gra
     for e1, e2 in edges:
         G.add_edge(e1, e2, color='black', style='solid')
 
-    cycles_edges = []
     for cycle in cycles:
         for i in range(len(cycle) - 1):
             G[cycle[i]][cycle[i + 1]]['color'] = 'red'
@@ -556,7 +541,9 @@ def build_graph(nodes, edges=[], bidirected_edges=[], cycles=[], plot_static_gra
 
 
 def causal_discovery_pipeline(text_title, text, entities=[], use_text_in_causal_discovery=False, use_LLM_pretrained_knowledge_in_causal_discovery=False, reverse_edge_for_variable_check=False, optimize_found_entities=True, use_text_in_entity_optimization=True, search_cycles=True, plot_static_graph=True, graph_directory_name='../graphs', verbose=False):
-    if verbose:
+    start = time.time()    
+    
+    if verbose and text:
         print('Text:')
         print(text)
         print('--')
@@ -569,11 +556,9 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_text_in_causal_
             print('--')
 
 
-    print(f'Entities: ({len(entities)} = {entities})')
 
     if verbose:
-        print(f'Entities: ({len(entities)})')
-        print(entities)
+        print(f'Entities: ({len(entities)} = {entities})')
         print('--')
 
     if optimize_found_entities:
@@ -581,15 +566,10 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_text_in_causal_
         entities = list(opt_entities.keys())
 
         if verbose:
-            print(f'Optimized Entities: ({len(entities)})')
-            print(entities)
-
-        print(f'Optimized Entities: ({len(entities)} = {entities})')
+            print(f'Optimized Entities: ({len(entities)} = {entities})')
         
 
-    graph_edges = gpt_causal_discovery(entities, text=(text if use_text_in_causal_discovery else None), use_pretrained_knowledge=use_LLM_pretrained_knowledge_in_causal_discovery, reverse_variable_check=reverse_edge_for_variable_check, verbose=verbose)
-
-    print('GPT CAUSAL QUERY DONE')
+    graph_edges = gpt_causal_discovery(entities, text=(text if use_text_in_causal_discovery else None), use_pretrained_knowledge=use_LLM_pretrained_knowledge_in_causal_discovery, reverse_variable_check=reverse_edge_for_variable_check)
 
     edges = extract_edge_answers(graph_edges)
     if verbose:
@@ -616,23 +596,25 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_text_in_causal_
 
         valid_edges.extend(corrected_edges)
         edges = valid_edges
-        
-        print('EDGE CORRECTION DONE')
     
-    nodes, processed_edges, bidirected_edges = preprocess_edges(edges)
+    nodes, directed_edges, bidirected_edges = preprocess_edges(edges)
+
+    graph_data = {'nodes': [nodes], 'edges': [directed_edges + bidirected_edges], 'cycles': []}
+    with open(f'{graph_directory_name}/{text_title}.json', "w") as json_file:
+            json.dump(graph_data, json_file, indent=4)
 
     if verbose:
         print('Nodes:')
         print(nodes)
         print('--')
         print('Processed Edges:')
-        print(processed_edges)
+        print(directed_edges)
         print('--')
 
     cycles = []
     if search_cycles:
-        cycles = find_cycles(nodes=nodes, edges=processed_edges)
-    build_graph(nodes=nodes, edges=processed_edges, bidirected_edges=bidirected_edges, cycles=cycles, plot_static_graph=plot_static_graph, directory_name=graph_directory_name, graph_name=text_title)
+        cycles = find_cycles(nodes=nodes, edges=directed_edges)
+    build_graph(nodes=nodes, edges=directed_edges, bidirected_edges=bidirected_edges, cycles=cycles, plot_static_graph=plot_static_graph, directory_name=graph_directory_name, graph_name=text_title)
     
     if verbose:
         if cycles:
@@ -642,213 +624,16 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_text_in_causal_
         
         print('--')
 
+    elapsed_seconds = time.time() - start
     if verbose:
         print_edges(graph_edges)
+        print(f'exec time : {time.strftime("%H:%M:%S", time.gmtime(elapsed_seconds))}')
     
-    return nodes, processed_edges + bidirected_edges, cycles
+    return nodes, directed_edges + bidirected_edges, cycles
 
 
-
-
-# Sample text for test
-def example_test():
+# Example text for test
+def example_test(directory='../results/'):
     text = 'Smoking involves inhaling tobacco fumes and it causes lung cancer and tumors.'
     text_title = 'Smoking - test'
-    return causal_discovery_pipeline(text_title, text, use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, optimize_found_entities=True, use_text_in_entity_optimization=True, search_cycles=True, plot_graphs=False, plot_interactive_graph=False, verbose=True)
-
-
-
-
-
-
-
-
-
-
-# Benchmarks
-def plot_causal_graph(nodes, edges, title):
-
-    if not nodes:
-        return None
-    
-    # Create a graph
-    G = nx.DiGraph()
-
-    # Add nodes
-    for node in nodes:
-        G.add_node(node)
-
-    # Add edges
-    for e1, e2 in edges:
-        G.add_edge(e1, e2)
-
-    # Plot the graph
-    pos = nx.spring_layout(G)
-    nx.draw_networkx_nodes(G, pos)
-    nx.draw_networkx_edges(G, pos, arrows=True)
-    nx.draw_networkx_labels(G, pos)
-    #add title to graph
-    plt.title(title)
-
-
-def f1_score(precision, recall):
-    return 2 * (precision * recall) / (precision + recall)
-
-
-def benchmark_evaluation(benchmark_title, ground_truth_nodes, ground_truth_edges, SHD_double_for_anticausal=True, plot_graphs=True, verbose=False):
-
-    if ground_truth_nodes is None or ground_truth_edges is None:
-        print("Ground truth nodes or edges are None.")
-        return None, None, None
-    
-    nodes, prediction_edges, cycles = causal_discovery_pipeline(f'{benchmark_title} - Prediction', '', entities=ground_truth_nodes, use_text_in_causal_discovery=False, use_LLM_pretrained_knowledge_in_causal_discovery=False, reverse_edge_for_variable_check=False, optimize_found_entities=False, use_text_in_entity_optimization=False, search_cycles=True, plot_graphs=plot_graphs, plot_interactive_graph=False, verbose=verbose)
-    print(prediction_edges)
-    if plot_graphs:
-        plot_causal_graph(ground_truth_nodes, ground_truth_edges, title=f'{benchmark_title} - Ground Truth')
-
-    ground_truth_graph = nx.DiGraph()
-    ground_truth_graph.add_nodes_from(nodes)
-    ground_truth_graph.add_edges_from(ground_truth_edges)
-
-    prediction_graph = nx.DiGraph()
-    prediction_graph.add_nodes_from(nodes)
-    prediction_graph.add_edges_from(prediction_edges)
-
-    shd = SHD(ground_truth_graph, prediction_graph, double_for_anticausal=SHD_double_for_anticausal)
-
-    if verbose:
-        print(f'SHD = {shd}')
-
-    aupr, curve = precision_recall(ground_truth_graph, prediction_graph)
-
-    if plot_graphs:
-        # Plot the precision-recall curve as a line plot
-        precision_values = [point[0] for point in curve]
-        recall_values = [point[1] for point in curve]
-        plt.figure()
-        plt.plot(recall_values, precision_values, marker='o', linestyle='-')
-        plt.xlabel('Recall')
-        plt.ylabel('Precision')
-        plt.title('Prediction Precision-Recall Curve')
-        plt.xlim(-0.1, 1.1)
-        plt.ylim(-0.1, 1.1)
-        plt.grid(True)
-
-        # ideal line
-        plt.plot([1.0, 1.0, 0.0], [0.0, 1.0, 1.0], linestyle='--')
-
-        plt.show()
-
-
-    if verbose:
-        print(f"Area under the precision-recall curve: {aupr}")
-
-    return shd, aupr, curve, prediction_edges, cycles
-
-
-def precision_recall_curve_plot(titles, curves):
-    fig = go.Figure()
-
-    for i, curve_point in enumerate(curves):
-        precision_values = [point[0] for point in curve_point]
-        recall_values = [point[1] for point in curve_point]
-
-        fig.add_trace(go.Scatter(
-                x=recall_values,
-                y=precision_values,
-                text=f'F1 score = {f1_score(precision_values[1], recall_values[1]):.2f}',
-                mode='lines+markers',
-                name=titles[i]
-            ))
-
-    # ideal line
-    fig.add_trace(go.Scatter(
-                x=[0.0, 1.0, 1.0],
-                y=[1.0, 1.0, 0.0],
-                text='F1 score = 1.0',
-                mode='lines+markers',
-                name='Ideal PR line',
-                line = dict(dash='dash'))
-            )
-
-    fig.update_layout(
-        title='Prediction Precision-Recall Curve',
-        xaxis_title='Recall',
-        yaxis_title='Precision',
-        xaxis=dict(range=[-0.1, 1.1]),
-        yaxis=dict(categoryorder='total ascending'),
-    )
-
-    fig.show()
-
-
-
-def f1_score_hist(titles, curves):
-    fig = go.Figure()
-
-    best_points = [points[1] for points in curves]
-    label = 'F1 score = '
-    for i, (precision, recall) in enumerate(best_points):
-        f1 = f1_score(precision, recall)
-
-        fig.add_trace(go.Bar(
-            y=[titles[i]],
-            x=[f1],
-            orientation='h',
-            text=f'{f1:.2f}',
-            textposition='inside',
-            hoverinfo='x',
-            name=titles[i]
-        ))
-
-    fig.update_layout(
-        title='F1 Scores for Benchmarks',
-        xaxis_title='F1 Score',
-        yaxis_title='Benchmark',
-        xaxis=dict(range=[0, 1.1]),
-        yaxis=dict(categoryorder='total ascending'),
-    )
-
-    fig.show()
-
-
-
-# Run causal discovery pipeline for all benchmarks
-def run_benchmarks():
-    ground_truth_graphs = [
-                        ('Asia_benchmark', ['visit to Asia', 'tubercolosis', 'lung cancer', 'bronchitis', 'dyspnoea', 'smoking', 'positive X-ray'], [('visit to Asia', 'tubercolosis'), ('smoking', 'lung cancer'), ('smoking', 'bronchitis'), ('bronchitis', 'dyspnoea'), ('lung cancer', 'dyspnoea'), ('tubercolosis', 'dyspnoea'), ('lung cancer', 'positive X-ray'), ('tubercolosis', 'positive X-ray')]),
-                        ('Smoking_benchmark', ['smoking', 'tobacco fumes', 'lung cancer', 'tumors'], [('smoking', 'tobacco fumes'), ('smoking', 'lung cancer'), ('smoking', 'tumors'), ('tobacco fumes', 'lung cancer'), ('tobacco fumes', 'tumors'), ('lung cancer', 'tumors'), ('tumors', 'lung cancer')]),
-                        ('Alcohol_benchmark', ['alcohol', 'liver cirrhosis', 'death'], [('alcohol', 'liver cirrhosis'), ('liver cirrhosis', 'death'), ('alcohol', 'death')]),
-                        ('Cancer_benchmark', ['smoking', 'respiratory disease', 'lung cancer', 'asbestos exposure'], [('smoking', 'respiratory disease'), ('respiratory disease', 'lung cancer'), ('asbestos exposure', 'lung cancer'), ('asbestos exposure', 'respiratory disease'), ('smoking', 'lung cancer')]),
-                        ('Diabetes_benchmark', ['lack of exercise', 'body weight', 'diabetes', 'diet'], [('lack of exercise', 'body weight'), ('lack of exercise', 'diabetes'), ('body weight', 'diabetes'), ('diet', 'diabetes'), ('diet', 'body weight')]),
-                        ('Obesity_benchmark', ['obesity', 'mortality', 'heart failure', 'heart defects'], [('obesity', 'mortality'), ('obesity', 'heart failure'), ('heart failure', 'mortality'), ('heart defects', 'heart failure'), ('heart defects', 'mortality')]),
-                        ]
-
-    titles = []
-    sdhs = []
-    auprs = []
-    curves = []
-    pred_edges = []
-    pred_cycles = []
-
-    for title, ground_truth_nodes, ground_truth_edges in ground_truth_graphs:
-        shd, aupr, curve, prediction_edges, prediction_cycles = benchmark_evaluation(title, ground_truth_nodes, ground_truth_edges, plot_graphs=False, verbose=False)
-        titles.append(title)
-        sdhs.append(shd)
-        auprs.append(aupr)
-        curves.append(curve)
-        pred_edges.append(prediction_edges)
-        pred_cycles.append(prediction_cycles)
-        print(f'{title} completed:')
-        print(f'    SHD                  = {shd}')
-        print(f'    Ground Truth edges   = {len(ground_truth_edges)} edges')
-        print(f'    Prediction edges     = {len(prediction_edges)} edges')
-        print(f'    Area PAC             = {aupr}')
-        print(f'    PAC point            = {curve}')
-        print(f'    Cycles               = {prediction_cycles}')
-        print('')
-
-    print('Benchmarks completed')
-
-    precision_recall_curve_plot(titles, curves)
-    f1_score_hist(titles, curves)
+    return causal_discovery_pipeline(text_title, text, use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, optimize_found_entities=True, use_text_in_entity_optimization=True, search_cycles=True, plot_static_graph=False, graph_directory_name=directory, verbose=True)

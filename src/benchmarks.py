@@ -11,7 +11,6 @@ from pyvis.network import Network
 import random
 import os
 
-#enum for algorithms (BASELINE, GPT)
 class Algorithm:
     BASELINE = 0
     GPT = 1
@@ -187,11 +186,10 @@ def shd_hist(shd_values, benchmark_titles, graph_path):
 def run_benchmarks(benchmark_algorithm=Algorithm.GPT):
 
     ground_truth_graphs = [
-                            #('Asia_benchmark', ['visit to Asia', 'tubercolosis', 'lung cancer', 'bronchitis', 'dyspnoea', 'smoking', 'positive X-ray'], [('visit to Asia', 'tubercolosis'), ('smoking', 'lung cancer'), ('smoking', 'bronchitis'), ('bronchitis', 'dyspnoea'), ('lung cancer', 'dyspnoea'), ('tubercolosis', 'dyspnoea'), ('lung cancer', 'positive X-ray'), ('tubercolosis', 'positive X-ray')]),
+                            ('Asia_benchmark', ['visit to Asia', 'tubercolosis', 'lung cancer', 'bronchitis', 'dyspnoea', 'smoking', 'positive X-ray'], [('visit to Asia', 'tubercolosis'), ('smoking', 'lung cancer'), ('smoking', 'bronchitis'), ('bronchitis', 'dyspnoea'), ('lung cancer', 'dyspnoea'), ('tubercolosis', 'dyspnoea'), ('lung cancer', 'positive X-ray'), ('tubercolosis', 'positive X-ray')]),
                             ('Smoking_benchmark', ['smoking', 'tobacco fumes', 'lung cancer', 'tumors'], [('smoking', 'tobacco fumes'), ('smoking', 'lung cancer'), ('smoking', 'tumors'), ('tobacco fumes', 'lung cancer'), ('tobacco fumes', 'tumors'), ('lung cancer', 'tumors'), ('tumors', 'lung cancer')]),
                             ('Alcohol_benchmark', ['alcohol', 'liver cirrhosis', 'death'], [('alcohol', 'liver cirrhosis'), ('liver cirrhosis', 'death'), ('alcohol', 'death')]),
                             ('Cancer_benchmark', ['smoking', 'respiratory disease', 'lung cancer', 'asbestos exposure'], [('smoking', 'respiratory disease'), ('respiratory disease', 'lung cancer'), ('asbestos exposure', 'lung cancer'), ('asbestos exposure', 'respiratory disease'), ('smoking', 'lung cancer')]),
-                            # ('Pollution_benchmark', ['pollution', 'cigarette smoking', 'lung cancer', 'dyspnoea', 'positive X-ray'], [('cigarette smoking', 'lung cancer'), ('pollution', 'lung cancer'), ('lung cancer', 'positive X-ray'), ('lung cancer', 'dyspnoea')]),
                             ('Diabetes_benchmark', ['lack of exercise', 'body weight', 'diabetes', 'diet'], [('lack of exercise', 'body weight'), ('lack of exercise', 'diabetes'), ('body weight', 'diabetes'), ('diet', 'diabetes'), ('diet', 'body weight')]),
                             ('Obesity_benchmark', ['obesity', 'mortality', 'heart failure', 'heart defects'], [('obesity', 'mortality'), ('obesity', 'heart failure'), ('heart failure', 'mortality'), ('heart defects', 'heart failure'), ('heart defects', 'mortality')]),
                             ]
@@ -208,7 +206,6 @@ def run_benchmarks(benchmark_algorithm=Algorithm.GPT):
     graphs_directory_path = f'{main_directory_path}/graphs'
     os.makedirs(graphs_directory_path, exist_ok=True)
     
-    # results = pd.DataFrame(columns=['title', 'SHD', 'Precision', 'Recall', 'F1', 'AUPR', 'PRC point', 'Prediction', 'Prediction'])
     data_list = []
 
     for title, ground_truth_nodes, ground_truth_edges in ground_truth_graphs:
@@ -221,8 +218,10 @@ def run_benchmarks(benchmark_algorithm=Algorithm.GPT):
         pred_cycles.append(prediction_cycles)
 
         extra_edges = []
+        missing_edges = []
         correct_direction = []
         incorrect_direction = []
+
         for e in prediction_edges:
             if e not in ground_truth_edges:
                 extra_edges.append(e)
@@ -231,7 +230,6 @@ def run_benchmarks(benchmark_algorithm=Algorithm.GPT):
             else:
                 incorrect_direction.append(e)
 
-        missing_edges = []
         for e in ground_truth_edges:
             if e not in prediction_edges:
                 missing_edges.append(e)
@@ -273,8 +271,6 @@ def run_benchmarks(benchmark_algorithm=Algorithm.GPT):
             'Cycles': prediction_cycles
         }
         data_list.append(row_data)
-
-        # results.append({'title': title, 'SHD': shd,  'Precision':curve[1][0], 'Recall':curve[1][1], 'F1':f1_score(curve[1][0], curve[1][1]), 'AUPR': aupr, 'PRC point': curve, 'Prediction': prediction_edges, 'Cycles': prediction_cycles}, ignore_index=True)
 
     results = pd.DataFrame(data_list)
     results.to_csv(f'{main_directory_path}/results.csv')
