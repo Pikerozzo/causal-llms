@@ -1,0 +1,52 @@
+INDICE
+ - contesto
+ - requisiti
+ - alternative esistenti (State of the Art)
+ - soluzione sviluppata
+ - test
+ - conclusioni
+
+
+
+
+
+CONTEXT:
+ advancement in causal inference is crucial, for sound decision-making, reliable AI systems,
+potential strong AI and AGI
+
+
+OBJECTIVE:
+ assessment of LLM causal analysis capabilities from text for aiding human efforts,
+ focus on causal discovery (finding causal graph)
+		(small theory introduction)
+ 
+SOTA:
+ from DATA (constraint-based and score-based methods)
+ with expert (knwoledge-based)
+ LLM-based (metadata-based)
+
+
+SOLUTION:
+ GPT API, prompt eng.
+ flow "Data collection -> causal analysis -> graph plotting"
+    - Data collection:
+          pubmed API, get_ids, get_data, clean_data
+
+    - Causal analysis:
+          gpt_NER, gpt_causal_discovery
+
+    - Graph plotting:
+          libraries & packages, normalize_edges, cycle_check, plot
+ 
+BENCHMARKS:
+ metrics
+ benchmark example
+ results
+
+DISCUSSION:
+ results discussion
+ limits
+
+CONCLUSIONS:
+ **docs project summary**
+ future work

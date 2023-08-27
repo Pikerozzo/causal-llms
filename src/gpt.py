@@ -532,7 +532,7 @@ def build_graph(nodes, edges=[], bidirected_edges=[], cycles=[], plot_static_gra
         plt.title(graph_name)
         plt.show()
 
-    net = Network(directed=True, notebook=True)
+    net = Network(directed=True)
     net.from_nx(G)
     net.force_atlas_2based()
     net.show_buttons(filter_=['physics'])
@@ -554,7 +554,6 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_text_in_causal_
         if verbose:
             print('Skipping NER operation. Using provided entities.')
             print('--')
-
 
 
     if verbose:
@@ -634,6 +633,6 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_text_in_causal_
 
 # Example text for test
 def example_test(directory='../results/'):
-    text = 'Smoking involves inhaling tobacco fumes and it causes lung cancer and tumors.'
-    text_title = 'Smoking - test'
-    return causal_discovery_pipeline(text_title, text, use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, optimize_found_entities=True, use_text_in_entity_optimization=True, search_cycles=True, plot_static_graph=False, graph_directory_name=directory, verbose=True)
+    text = 'Excessive alcohol consumption can cause liver cirrhosis, and both can lead to death.'
+    text_title = 'Example test'
+    return causal_discovery_pipeline(text_title, text, use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, optimize_found_entities=False, use_text_in_entity_optimization=False, search_cycles=True, plot_static_graph=False, graph_directory_name=directory, verbose=False)

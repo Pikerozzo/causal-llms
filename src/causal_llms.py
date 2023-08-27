@@ -92,7 +92,7 @@ def run_example_test():
     os.makedirs(directory , exist_ok=True)
 
     gpt.example_test(directory)
-
+    print('\n--\nTEST COMPLETE')
 
 
 class MyArgumentParser(argparse.ArgumentParser):
@@ -126,7 +126,7 @@ Examples:
 The `algorithm` parameter specifies the algorithm to use for the benchmark tests.
 The possible values are:
 * `b`: Baseline algorithm
-* `gpt`: GPT algorithm
+* `gpt`: GPT LLM
 """
         file.write(custom_help +"\n")
 
