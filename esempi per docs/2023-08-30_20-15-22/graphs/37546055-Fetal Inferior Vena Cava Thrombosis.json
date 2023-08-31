@@ -1,0 +1,319 @@
+{
+    "nodes": [
+        [
+            "heterogenous and calcified thrombus",
+            "inferior vena cava (IVC)",
+            "25-year-old gravida 2 para 1 type 1 diabetic female",
+            "pleural effusion",
+            "Prenatal assessment",
+            "fetal ascites",
+            "fetal anemia",
+            "Ultrasound (US)",
+            "non-immune hydrops fetalis",
+            "29 and 4/7 weeks' gestation",
+            "pregnancies",
+            "intrauterine transfusion",
+            "pulmonary edema",
+            "Cordocentesis",
+            "mirror syndrome",
+            "atypical presentations",
+            "middle cerebral artery peak systolic velocity (MCA-PSV)",
+            "placentomegaly"
+        ]
+    ],
+    "edges": [
+        [
+            [
+                "pregnancies",
+                "Prenatal assessment"
+            ],
+            [
+                "atypical presentations",
+                "Prenatal assessment"
+            ],
+            [
+                "fetal ascites",
+                "Prenatal assessment"
+            ],
+            [
+                "placentomegaly",
+                "Prenatal assessment"
+            ],
+            [
+                "25-year-old gravida 2 para 1 type 1 diabetic female",
+                "Prenatal assessment"
+            ],
+            [
+                "fetal anemia",
+                "Prenatal assessment"
+            ],
+            [
+                "Prenatal assessment",
+                "Cordocentesis"
+            ],
+            [
+                "Prenatal assessment",
+                "intrauterine transfusion"
+            ],
+            [
+                "pregnancies",
+                "atypical presentations"
+            ],
+            [
+                "pregnancies",
+                "29 and 4/7 weeks' gestation"
+            ],
+            [
+                "pregnancies",
+                "Ultrasound (US)"
+            ],
+            [
+                "pregnancies",
+                "intrauterine transfusion"
+            ],
+            [
+                "pregnancies",
+                "mirror syndrome"
+            ],
+            [
+                "fetal ascites",
+                "atypical presentations"
+            ],
+            [
+                "atypical presentations",
+                "Ultrasound (US)"
+            ],
+            [
+                "atypical presentations",
+                "Cordocentesis"
+            ],
+            [
+                "atypical presentations",
+                "intrauterine transfusion"
+            ],
+            [
+                "fetal ascites",
+                "intrauterine transfusion"
+            ],
+            [
+                "fetal ascites",
+                "mirror syndrome"
+            ],
+            [
+                "fetal ascites",
+                "non-immune hydrops fetalis"
+            ],
+            [
+                "25-year-old gravida 2 para 1 type 1 diabetic female",
+                "29 and 4/7 weeks' gestation"
+            ],
+            [
+                "25-year-old gravida 2 para 1 type 1 diabetic female",
+                "Cordocentesis"
+            ],
+            [
+                "25-year-old gravida 2 para 1 type 1 diabetic female",
+                "intrauterine transfusion"
+            ],
+            [
+                "Ultrasound (US)",
+                "intrauterine transfusion"
+            ],
+            [
+                "fetal anemia",
+                "middle cerebral artery peak systolic velocity (MCA-PSV)"
+            ],
+            [
+                "middle cerebral artery peak systolic velocity (MCA-PSV)",
+                "Cordocentesis"
+            ],
+            [
+                "middle cerebral artery peak systolic velocity (MCA-PSV)",
+                "intrauterine transfusion"
+            ],
+            [
+                "fetal anemia",
+                "Cordocentesis"
+            ],
+            [
+                "fetal anemia",
+                "intrauterine transfusion"
+            ],
+            [
+                "Cordocentesis",
+                "intrauterine transfusion"
+            ],
+            [
+                "Cordocentesis",
+                "pulmonary edema"
+            ],
+            [
+                "Cordocentesis",
+                "mirror syndrome"
+            ],
+            [
+                "intrauterine transfusion",
+                "pulmonary edema"
+            ],
+            [
+                "intrauterine transfusion",
+                "mirror syndrome"
+            ],
+            [
+                "mirror syndrome",
+                "pulmonary edema"
+            ],
+            [
+                "mirror syndrome",
+                "pleural effusion"
+            ],
+            [
+                "intrauterine transfusion",
+                "inferior vena cava (IVC)"
+            ],
+            [
+                "inferior vena cava (IVC)",
+                "intrauterine transfusion"
+            ],
+            [
+                "pleural effusion",
+                "pregnancies"
+            ],
+            [
+                "pregnancies",
+                "pleural effusion"
+            ],
+            [
+                "heterogenous and calcified thrombus",
+                "atypical presentations"
+            ],
+            [
+                "atypical presentations",
+                "heterogenous and calcified thrombus"
+            ],
+            [
+                "placentomegaly",
+                "fetal ascites"
+            ],
+            [
+                "fetal ascites",
+                "placentomegaly"
+            ],
+            [
+                "fetal anemia",
+                "fetal ascites"
+            ],
+            [
+                "fetal ascites",
+                "fetal anemia"
+            ],
+            [
+                "Cordocentesis",
+                "fetal ascites"
+            ],
+            [
+                "fetal ascites",
+                "Cordocentesis"
+            ],
+            [
+                "pulmonary edema",
+                "fetal ascites"
+            ],
+            [
+                "fetal ascites",
+                "pulmonary edema"
+            ],
+            [
+                "pleural effusion",
+                "fetal ascites"
+            ],
+            [
+                "fetal ascites",
+                "pleural effusion"
+            ],
+            [
+                "pulmonary edema",
+                "fetal anemia"
+            ],
+            [
+                "fetal anemia",
+                "pulmonary edema"
+            ],
+            [
+                "pleural effusion",
+                "fetal anemia"
+            ],
+            [
+                "fetal anemia",
+                "pleural effusion"
+            ],
+            [
+                "non-immune hydrops fetalis",
+                "fetal anemia"
+            ],
+            [
+                "fetal anemia",
+                "non-immune hydrops fetalis"
+            ],
+            [
+                "pleural effusion",
+                "intrauterine transfusion"
+            ],
+            [
+                "intrauterine transfusion",
+                "pleural effusion"
+            ],
+            [
+                "non-immune hydrops fetalis",
+                "intrauterine transfusion"
+            ],
+            [
+                "intrauterine transfusion",
+                "non-immune hydrops fetalis"
+            ],
+            [
+                "pleural effusion",
+                "pulmonary edema"
+            ],
+            [
+                "pulmonary edema",
+                "pleural effusion"
+            ],
+            [
+                "non-immune hydrops fetalis",
+                "pulmonary edema"
+            ],
+            [
+                "pulmonary edema",
+                "non-immune hydrops fetalis"
+            ],
+            [
+                "non-immune hydrops fetalis",
+                "pleural effusion"
+            ],
+            [
+                "pleural effusion",
+                "non-immune hydrops fetalis"
+            ],
+            [
+                "non-immune hydrops fetalis",
+                "mirror syndrome"
+            ],
+            [
+                "mirror syndrome",
+                "non-immune hydrops fetalis"
+            ],
+            [
+                "heterogenous and calcified thrombus",
+                "mirror syndrome"
+            ],
+            [
+                "mirror syndrome",
+                "heterogenous and calcified thrombus"
+            ]
+        ]
+    ],
+    "cycles": [
+        []
+    ]
+}

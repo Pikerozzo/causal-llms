@@ -1,0 +1,586 @@
+{
+    "nodes": [
+        [
+            "hypertension",
+            "coma",
+            "headache",
+            "Posterior reversible encephalopathy syndrome (PRES)",
+            "61-year-old female",
+            "generalized limb weakness",
+            "eclampsia",
+            "reversible subcortical vasogenic edema",
+            "confusion",
+            "advanced breast carcinoma",
+            "occipital and frontal lobe",
+            "altered sensorium",
+            "chemotherapeutic drugs",
+            "chronic renal failure",
+            "hypercalcemia",
+            "brain imaging",
+            "seizures"
+        ]
+    ],
+    "edges": [
+        [
+            [
+                "Posterior reversible encephalopathy syndrome (PRES)",
+                "headache"
+            ],
+            [
+                "Posterior reversible encephalopathy syndrome (PRES)",
+                "confusion"
+            ],
+            [
+                "Posterior reversible encephalopathy syndrome (PRES)",
+                "seizures"
+            ],
+            [
+                "Posterior reversible encephalopathy syndrome (PRES)",
+                "coma"
+            ],
+            [
+                "Posterior reversible encephalopathy syndrome (PRES)",
+                "reversible subcortical vasogenic edema"
+            ],
+            [
+                "chronic renal failure",
+                "Posterior reversible encephalopathy syndrome (PRES)"
+            ],
+            [
+                "hypertension",
+                "Posterior reversible encephalopathy syndrome (PRES)"
+            ],
+            [
+                "chemotherapeutic drugs",
+                "Posterior reversible encephalopathy syndrome (PRES)"
+            ],
+            [
+                "eclampsia",
+                "Posterior reversible encephalopathy syndrome (PRES)"
+            ],
+            [
+                "hypercalcemia",
+                "Posterior reversible encephalopathy syndrome (PRES)"
+            ],
+            [
+                "advanced breast carcinoma",
+                "Posterior reversible encephalopathy syndrome (PRES)"
+            ],
+            [
+                "Posterior reversible encephalopathy syndrome (PRES)",
+                "altered sensorium"
+            ],
+            [
+                "Posterior reversible encephalopathy syndrome (PRES)",
+                "generalized limb weakness"
+            ],
+            [
+                "Posterior reversible encephalopathy syndrome (PRES)",
+                "occipital and frontal lobe"
+            ],
+            [
+                "chemotherapeutic drugs",
+                "headache"
+            ],
+            [
+                "hypercalcemia",
+                "headache"
+            ],
+            [
+                "advanced breast carcinoma",
+                "headache"
+            ],
+            [
+                "chronic renal failure",
+                "confusion"
+            ],
+            [
+                "hypertension",
+                "confusion"
+            ],
+            [
+                "chemotherapeutic drugs",
+                "confusion"
+            ],
+            [
+                "eclampsia",
+                "confusion"
+            ],
+            [
+                "hypercalcemia",
+                "confusion"
+            ],
+            [
+                "61-year-old female",
+                "confusion"
+            ],
+            [
+                "advanced breast carcinoma",
+                "confusion"
+            ],
+            [
+                "occipital and frontal lobe",
+                "confusion"
+            ],
+            [
+                "chronic renal failure",
+                "seizures"
+            ],
+            [
+                "hypertension",
+                "seizures"
+            ],
+            [
+                "chemotherapeutic drugs",
+                "seizures"
+            ],
+            [
+                "eclampsia",
+                "seizures"
+            ],
+            [
+                "hypercalcemia",
+                "seizures"
+            ],
+            [
+                "61-year-old female",
+                "seizures"
+            ],
+            [
+                "hypertension",
+                "coma"
+            ],
+            [
+                "hypercalcemia",
+                "coma"
+            ],
+            [
+                "advanced breast carcinoma",
+                "coma"
+            ],
+            [
+                "chronic renal failure",
+                "reversible subcortical vasogenic edema"
+            ],
+            [
+                "hypertension",
+                "reversible subcortical vasogenic edema"
+            ],
+            [
+                "chemotherapeutic drugs",
+                "reversible subcortical vasogenic edema"
+            ],
+            [
+                "hypercalcemia",
+                "reversible subcortical vasogenic edema"
+            ],
+            [
+                "61-year-old female",
+                "reversible subcortical vasogenic edema"
+            ],
+            [
+                "advanced breast carcinoma",
+                "reversible subcortical vasogenic edema"
+            ],
+            [
+                "occipital and frontal lobe",
+                "reversible subcortical vasogenic edema"
+            ],
+            [
+                "advanced breast carcinoma",
+                "chemotherapeutic drugs"
+            ],
+            [
+                "advanced breast carcinoma",
+                "hypercalcemia"
+            ],
+            [
+                "hypercalcemia",
+                "altered sensorium"
+            ],
+            [
+                "hypercalcemia",
+                "generalized limb weakness"
+            ],
+            [
+                "hypercalcemia",
+                "occipital and frontal lobe"
+            ],
+            [
+                "61-year-old female",
+                "brain imaging"
+            ],
+            [
+                "advanced breast carcinoma",
+                "generalized limb weakness"
+            ],
+            [
+                "occipital and frontal lobe",
+                "altered sensorium"
+            ],
+            [
+                "generalized limb weakness",
+                "brain imaging"
+            ],
+            [
+                "occipital and frontal lobe",
+                "brain imaging"
+            ],
+            [
+                "confusion",
+                "headache"
+            ],
+            [
+                "headache",
+                "confusion"
+            ],
+            [
+                "seizures",
+                "headache"
+            ],
+            [
+                "headache",
+                "seizures"
+            ],
+            [
+                "coma",
+                "headache"
+            ],
+            [
+                "headache",
+                "coma"
+            ],
+            [
+                "reversible subcortical vasogenic edema",
+                "headache"
+            ],
+            [
+                "headache",
+                "reversible subcortical vasogenic edema"
+            ],
+            [
+                "hypertension",
+                "headache"
+            ],
+            [
+                "headache",
+                "hypertension"
+            ],
+            [
+                "eclampsia",
+                "headache"
+            ],
+            [
+                "headache",
+                "eclampsia"
+            ],
+            [
+                "altered sensorium",
+                "headache"
+            ],
+            [
+                "headache",
+                "altered sensorium"
+            ],
+            [
+                "generalized limb weakness",
+                "headache"
+            ],
+            [
+                "headache",
+                "generalized limb weakness"
+            ],
+            [
+                "occipital and frontal lobe",
+                "headache"
+            ],
+            [
+                "headache",
+                "occipital and frontal lobe"
+            ],
+            [
+                "seizures",
+                "confusion"
+            ],
+            [
+                "confusion",
+                "seizures"
+            ],
+            [
+                "coma",
+                "confusion"
+            ],
+            [
+                "confusion",
+                "coma"
+            ],
+            [
+                "reversible subcortical vasogenic edema",
+                "confusion"
+            ],
+            [
+                "confusion",
+                "reversible subcortical vasogenic edema"
+            ],
+            [
+                "altered sensorium",
+                "confusion"
+            ],
+            [
+                "confusion",
+                "altered sensorium"
+            ],
+            [
+                "generalized limb weakness",
+                "confusion"
+            ],
+            [
+                "confusion",
+                "generalized limb weakness"
+            ],
+            [
+                "brain imaging",
+                "confusion"
+            ],
+            [
+                "confusion",
+                "brain imaging"
+            ],
+            [
+                "coma",
+                "seizures"
+            ],
+            [
+                "seizures",
+                "coma"
+            ],
+            [
+                "reversible subcortical vasogenic edema",
+                "seizures"
+            ],
+            [
+                "seizures",
+                "reversible subcortical vasogenic edema"
+            ],
+            [
+                "altered sensorium",
+                "seizures"
+            ],
+            [
+                "seizures",
+                "altered sensorium"
+            ],
+            [
+                "generalized limb weakness",
+                "seizures"
+            ],
+            [
+                "seizures",
+                "generalized limb weakness"
+            ],
+            [
+                "brain imaging",
+                "seizures"
+            ],
+            [
+                "seizures",
+                "brain imaging"
+            ],
+            [
+                "occipital and frontal lobe",
+                "seizures"
+            ],
+            [
+                "seizures",
+                "occipital and frontal lobe"
+            ],
+            [
+                "reversible subcortical vasogenic edema",
+                "coma"
+            ],
+            [
+                "coma",
+                "reversible subcortical vasogenic edema"
+            ],
+            [
+                "chemotherapeutic drugs",
+                "coma"
+            ],
+            [
+                "coma",
+                "chemotherapeutic drugs"
+            ],
+            [
+                "altered sensorium",
+                "coma"
+            ],
+            [
+                "coma",
+                "altered sensorium"
+            ],
+            [
+                "generalized limb weakness",
+                "coma"
+            ],
+            [
+                "coma",
+                "generalized limb weakness"
+            ],
+            [
+                "brain imaging",
+                "coma"
+            ],
+            [
+                "coma",
+                "brain imaging"
+            ],
+            [
+                "occipital and frontal lobe",
+                "coma"
+            ],
+            [
+                "coma",
+                "occipital and frontal lobe"
+            ],
+            [
+                "altered sensorium",
+                "reversible subcortical vasogenic edema"
+            ],
+            [
+                "reversible subcortical vasogenic edema",
+                "altered sensorium"
+            ],
+            [
+                "generalized limb weakness",
+                "reversible subcortical vasogenic edema"
+            ],
+            [
+                "reversible subcortical vasogenic edema",
+                "generalized limb weakness"
+            ],
+            [
+                "brain imaging",
+                "reversible subcortical vasogenic edema"
+            ],
+            [
+                "reversible subcortical vasogenic edema",
+                "brain imaging"
+            ],
+            [
+                "eclampsia",
+                "hypertension"
+            ],
+            [
+                "hypertension",
+                "eclampsia"
+            ],
+            [
+                "altered sensorium",
+                "hypertension"
+            ],
+            [
+                "hypertension",
+                "altered sensorium"
+            ],
+            [
+                "altered sensorium",
+                "eclampsia"
+            ],
+            [
+                "eclampsia",
+                "altered sensorium"
+            ],
+            [
+                "generalized limb weakness",
+                "eclampsia"
+            ],
+            [
+                "eclampsia",
+                "generalized limb weakness"
+            ],
+            [
+                "brain imaging",
+                "eclampsia"
+            ],
+            [
+                "eclampsia",
+                "brain imaging"
+            ],
+            [
+                "altered sensorium",
+                "61-year-old female"
+            ],
+            [
+                "61-year-old female",
+                "altered sensorium"
+            ],
+            [
+                "generalized limb weakness",
+                "61-year-old female"
+            ],
+            [
+                "61-year-old female",
+                "generalized limb weakness"
+            ],
+            [
+                "occipital and frontal lobe",
+                "61-year-old female"
+            ],
+            [
+                "61-year-old female",
+                "occipital and frontal lobe"
+            ],
+            [
+                "altered sensorium",
+                "advanced breast carcinoma"
+            ],
+            [
+                "advanced breast carcinoma",
+                "altered sensorium"
+            ],
+            [
+                "brain imaging",
+                "advanced breast carcinoma"
+            ],
+            [
+                "advanced breast carcinoma",
+                "brain imaging"
+            ],
+            [
+                "occipital and frontal lobe",
+                "advanced breast carcinoma"
+            ],
+            [
+                "advanced breast carcinoma",
+                "occipital and frontal lobe"
+            ],
+            [
+                "generalized limb weakness",
+                "altered sensorium"
+            ],
+            [
+                "altered sensorium",
+                "generalized limb weakness"
+            ],
+            [
+                "brain imaging",
+                "altered sensorium"
+            ],
+            [
+                "altered sensorium",
+                "brain imaging"
+            ],
+            [
+                "occipital and frontal lobe",
+                "generalized limb weakness"
+            ],
+            [
+                "generalized limb weakness",
+                "occipital and frontal lobe"
+            ]
+        ]
+    ],
+    "cycles": [
+        []
+    ]
+}

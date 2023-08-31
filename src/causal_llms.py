@@ -8,7 +8,7 @@ from datetime import datetime
 import benchmarks
 import json
 import os
-
+import time
 
 def sanitize_string(string, max_length=100):
     string = re.sub(r'[\\/:*?"<>|]', '_', string)
@@ -32,7 +32,7 @@ def causal_analysis(data, file_name=None, use_short_abstracts=False, max_abstrac
     os.makedirs(directory, exist_ok=True)
     os.makedirs(graphs_directory, exist_ok=True)
 
-    results = pd.DataFrame(columns=['id', 'title', 'abstract'])
+    results = pd.DataFrame(columns=['id', 'title', 'abstract', 'exec_time'])
 
     print(len(data))
 
@@ -44,10 +44,12 @@ def causal_analysis(data, file_name=None, use_short_abstracts=False, max_abstrac
         title = sanitize_string(row['title'], 35)
         article_ref = f'{row["id"]}-{title}'
 
-
+        start = time.time()
         print(f'\n-------- {row["title"]} --------\n')
         nodes, edges, cycles = gpt.causal_discovery_pipeline(article_ref, row['abstract'], use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, optimize_found_entities=True, use_text_in_entity_optimization=True, search_cycles=True, plot_static_graph=False, graph_directory_name=graphs_directory, verbose=False)
-        new_row = pd.DataFrame({'id': row['id'], 'title': row['title'], 'abstract': row['abstract']}, index=[0])
+        elapsed_seconds = time.time() - start
+
+        new_row = pd.DataFrame({'id': row['id'], 'title': row['title'], 'abstract': row['abstract'], 'exec_time': time.strftime("%H:%M:%S", time.gmtime(elapsed_seconds))}, index=[0])
         results = pd.concat([results, new_row]).reset_index(drop=True)
         results.to_csv(file_name, index=False)
 

@@ -1,0 +1,87 @@
+{
+    "nodes": [
+        [
+            "adult patients",
+            "children",
+            "mapping and ablation technology",
+            "arrhythmic disease",
+            "Wolff-Parkinson-White syndrome",
+            "cardiac genomics",
+            "pacemakers",
+            "congenital heart disease",
+            "congenital atrioventricular (AV) block",
+            "cardiac resynchronization therapy devices"
+        ]
+    ],
+    "edges": [
+        [
+            [
+                "congenital heart disease",
+                "arrhythmic disease"
+            ],
+            [
+                "arrhythmic disease",
+                "pacemakers"
+            ],
+            [
+                "arrhythmic disease",
+                "cardiac resynchronization therapy devices"
+            ],
+            [
+                "arrhythmic disease",
+                "mapping and ablation technology"
+            ],
+            [
+                "adult patients",
+                "pacemakers"
+            ],
+            [
+                "adult patients",
+                "cardiac resynchronization therapy devices"
+            ],
+            [
+                "congenital heart disease",
+                "congenital atrioventricular (AV) block"
+            ],
+            [
+                "congenital heart disease",
+                "pacemakers"
+            ],
+            [
+                "congenital heart disease",
+                "cardiac resynchronization therapy devices"
+            ],
+            [
+                "congenital atrioventricular (AV) block",
+                "pacemakers"
+            ],
+            [
+                "congenital atrioventricular (AV) block",
+                "cardiac resynchronization therapy devices"
+            ],
+            [
+                "Wolff-Parkinson-White syndrome",
+                "pacemakers"
+            ],
+            [
+                "pacemakers",
+                "children"
+            ],
+            [
+                "children",
+                "pacemakers"
+            ],
+            [
+                "cardiac resynchronization therapy devices",
+                "children"
+            ],
+            [
+                "children",
+                "cardiac resynchronization therapy devices"
+            ]
+        ]
+    ],
+    "cycles": [
+        []
+    ]
+}

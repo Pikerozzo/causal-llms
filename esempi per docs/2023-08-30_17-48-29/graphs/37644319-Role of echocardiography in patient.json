@@ -1,0 +1,350 @@
+{
+    "nodes": [
+        [
+            "heart",
+            "immune checkpoint inhibitors (ICIs)",
+            "cardio-oncology",
+            "role of echocardiography",
+            "pericardial diseases",
+            "myocarditis",
+            "management strategies",
+            "Immune-related adverse events",
+            "takotsubo cardiomyopathy",
+            "cancer treatment",
+            "cardiac disorders",
+            "conduction disturbance",
+            "arrhythmia"
+        ]
+    ],
+    "edges": [
+        [
+            [
+                "Immune-related adverse events",
+                "heart"
+            ],
+            [
+                "immune checkpoint inhibitors (ICIs)",
+                "Immune-related adverse events"
+            ],
+            [
+                "Immune-related adverse events",
+                "myocarditis"
+            ],
+            [
+                "Immune-related adverse events",
+                "arrhythmia"
+            ],
+            [
+                "Immune-related adverse events",
+                "conduction disturbance"
+            ],
+            [
+                "Immune-related adverse events",
+                "pericardial diseases"
+            ],
+            [
+                "Immune-related adverse events",
+                "takotsubo cardiomyopathy"
+            ],
+            [
+                "Immune-related adverse events",
+                "cardio-oncology"
+            ],
+            [
+                "Immune-related adverse events",
+                "cardiac disorders"
+            ],
+            [
+                "cancer treatment",
+                "Immune-related adverse events"
+            ],
+            [
+                "Immune-related adverse events",
+                "management strategies"
+            ],
+            [
+                "Immune-related adverse events",
+                "role of echocardiography"
+            ],
+            [
+                "heart",
+                "myocarditis"
+            ],
+            [
+                "cancer treatment",
+                "heart"
+            ],
+            [
+                "heart",
+                "management strategies"
+            ],
+            [
+                "immune checkpoint inhibitors (ICIs)",
+                "myocarditis"
+            ],
+            [
+                "immune checkpoint inhibitors (ICIs)",
+                "arrhythmia"
+            ],
+            [
+                "immune checkpoint inhibitors (ICIs)",
+                "conduction disturbance"
+            ],
+            [
+                "immune checkpoint inhibitors (ICIs)",
+                "pericardial diseases"
+            ],
+            [
+                "immune checkpoint inhibitors (ICIs)",
+                "takotsubo cardiomyopathy"
+            ],
+            [
+                "immune checkpoint inhibitors (ICIs)",
+                "cardiac disorders"
+            ],
+            [
+                "immune checkpoint inhibitors (ICIs)",
+                "management strategies"
+            ],
+            [
+                "immune checkpoint inhibitors (ICIs)",
+                "role of echocardiography"
+            ],
+            [
+                "myocarditis",
+                "conduction disturbance"
+            ],
+            [
+                "cancer treatment",
+                "myocarditis"
+            ],
+            [
+                "myocarditis",
+                "management strategies"
+            ],
+            [
+                "myocarditis",
+                "role of echocardiography"
+            ],
+            [
+                "cancer treatment",
+                "arrhythmia"
+            ],
+            [
+                "cancer treatment",
+                "conduction disturbance"
+            ],
+            [
+                "conduction disturbance",
+                "management strategies"
+            ],
+            [
+                "cancer treatment",
+                "pericardial diseases"
+            ],
+            [
+                "pericardial diseases",
+                "management strategies"
+            ],
+            [
+                "cancer treatment",
+                "takotsubo cardiomyopathy"
+            ],
+            [
+                "takotsubo cardiomyopathy",
+                "management strategies"
+            ],
+            [
+                "cardiac disorders",
+                "cardio-oncology"
+            ],
+            [
+                "cancer treatment",
+                "cardio-oncology"
+            ],
+            [
+                "cardio-oncology",
+                "management strategies"
+            ],
+            [
+                "cancer treatment",
+                "cardiac disorders"
+            ],
+            [
+                "cardiac disorders",
+                "management strategies"
+            ],
+            [
+                "cardiac disorders",
+                "role of echocardiography"
+            ],
+            [
+                "cancer treatment",
+                "management strategies"
+            ],
+            [
+                "cancer treatment",
+                "role of echocardiography"
+            ],
+            [
+                "role of echocardiography",
+                "management strategies"
+            ],
+            [
+                "arrhythmia",
+                "heart"
+            ],
+            [
+                "heart",
+                "arrhythmia"
+            ],
+            [
+                "conduction disturbance",
+                "heart"
+            ],
+            [
+                "heart",
+                "conduction disturbance"
+            ],
+            [
+                "pericardial diseases",
+                "heart"
+            ],
+            [
+                "heart",
+                "pericardial diseases"
+            ],
+            [
+                "takotsubo cardiomyopathy",
+                "heart"
+            ],
+            [
+                "heart",
+                "takotsubo cardiomyopathy"
+            ],
+            [
+                "cardio-oncology",
+                "heart"
+            ],
+            [
+                "heart",
+                "cardio-oncology"
+            ],
+            [
+                "cardiac disorders",
+                "heart"
+            ],
+            [
+                "heart",
+                "cardiac disorders"
+            ],
+            [
+                "role of echocardiography",
+                "heart"
+            ],
+            [
+                "heart",
+                "role of echocardiography"
+            ],
+            [
+                "arrhythmia",
+                "myocarditis"
+            ],
+            [
+                "myocarditis",
+                "arrhythmia"
+            ],
+            [
+                "pericardial diseases",
+                "myocarditis"
+            ],
+            [
+                "myocarditis",
+                "pericardial diseases"
+            ],
+            [
+                "conduction disturbance",
+                "arrhythmia"
+            ],
+            [
+                "arrhythmia",
+                "conduction disturbance"
+            ],
+            [
+                "pericardial diseases",
+                "arrhythmia"
+            ],
+            [
+                "arrhythmia",
+                "pericardial diseases"
+            ],
+            [
+                "takotsubo cardiomyopathy",
+                "arrhythmia"
+            ],
+            [
+                "arrhythmia",
+                "takotsubo cardiomyopathy"
+            ],
+            [
+                "management strategies",
+                "arrhythmia"
+            ],
+            [
+                "arrhythmia",
+                "management strategies"
+            ],
+            [
+                "takotsubo cardiomyopathy",
+                "conduction disturbance"
+            ],
+            [
+                "conduction disturbance",
+                "takotsubo cardiomyopathy"
+            ],
+            [
+                "cardiac disorders",
+                "conduction disturbance"
+            ],
+            [
+                "conduction disturbance",
+                "cardiac disorders"
+            ],
+            [
+                "takotsubo cardiomyopathy",
+                "pericardial diseases"
+            ],
+            [
+                "pericardial diseases",
+                "takotsubo cardiomyopathy"
+            ],
+            [
+                "cardiac disorders",
+                "pericardial diseases"
+            ],
+            [
+                "pericardial diseases",
+                "cardiac disorders"
+            ],
+            [
+                "cardiac disorders",
+                "takotsubo cardiomyopathy"
+            ],
+            [
+                "takotsubo cardiomyopathy",
+                "cardiac disorders"
+            ],
+            [
+                "role of echocardiography",
+                "takotsubo cardiomyopathy"
+            ],
+            [
+                "takotsubo cardiomyopathy",
+                "role of echocardiography"
+            ]
+        ]
+    ],
+    "cycles": [
+        []
+    ]
+}

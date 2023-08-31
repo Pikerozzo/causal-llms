@@ -1,0 +1,189 @@
+{
+    "nodes": [
+        [
+            "Gliosarcoma (GS)",
+            "Brain MRI",
+            "unsteady gait",
+            "glioblastoma multiforme (GBM)",
+            "mass effect on the right lateral ventricle",
+            "complications",
+            "right-sided frontotemporal craniotomy",
+            "skull base",
+            "perilesional edema",
+            "postoperative recovery",
+            "biomorphic tissue pattern",
+            "62-year-old male"
+        ]
+    ],
+    "edges": [
+        [
+            [
+                "glioblastoma multiforme (GBM)",
+                "Gliosarcoma (GS)"
+            ],
+            [
+                "Gliosarcoma (GS)",
+                "skull base"
+            ],
+            [
+                "Gliosarcoma (GS)",
+                "biomorphic tissue pattern"
+            ],
+            [
+                "Gliosarcoma (GS)",
+                "unsteady gait"
+            ],
+            [
+                "Gliosarcoma (GS)",
+                "perilesional edema"
+            ],
+            [
+                "Gliosarcoma (GS)",
+                "mass effect on the right lateral ventricle"
+            ],
+            [
+                "Gliosarcoma (GS)",
+                "right-sided frontotemporal craniotomy"
+            ],
+            [
+                "Gliosarcoma (GS)",
+                "postoperative recovery"
+            ],
+            [
+                "glioblastoma multiforme (GBM)",
+                "skull base"
+            ],
+            [
+                "glioblastoma multiforme (GBM)",
+                "biomorphic tissue pattern"
+            ],
+            [
+                "glioblastoma multiforme (GBM)",
+                "unsteady gait"
+            ],
+            [
+                "glioblastoma multiforme (GBM)",
+                "Brain MRI"
+            ],
+            [
+                "glioblastoma multiforme (GBM)",
+                "perilesional edema"
+            ],
+            [
+                "glioblastoma multiforme (GBM)",
+                "mass effect on the right lateral ventricle"
+            ],
+            [
+                "glioblastoma multiforme (GBM)",
+                "right-sided frontotemporal craniotomy"
+            ],
+            [
+                "skull base",
+                "unsteady gait"
+            ],
+            [
+                "skull base",
+                "mass effect on the right lateral ventricle"
+            ],
+            [
+                "skull base",
+                "right-sided frontotemporal craniotomy"
+            ],
+            [
+                "biomorphic tissue pattern",
+                "mass effect on the right lateral ventricle"
+            ],
+            [
+                "biomorphic tissue pattern",
+                "right-sided frontotemporal craniotomy"
+            ],
+            [
+                "62-year-old male",
+                "Brain MRI"
+            ],
+            [
+                "62-year-old male",
+                "right-sided frontotemporal craniotomy"
+            ],
+            [
+                "mass effect on the right lateral ventricle",
+                "unsteady gait"
+            ],
+            [
+                "mass effect on the right lateral ventricle",
+                "Brain MRI"
+            ],
+            [
+                "Brain MRI",
+                "right-sided frontotemporal craniotomy"
+            ],
+            [
+                "mass effect on the right lateral ventricle",
+                "right-sided frontotemporal craniotomy"
+            ],
+            [
+                "right-sided frontotemporal craniotomy",
+                "postoperative recovery"
+            ],
+            [
+                "perilesional edema",
+                "biomorphic tissue pattern"
+            ],
+            [
+                "biomorphic tissue pattern",
+                "perilesional edema"
+            ],
+            [
+                "perilesional edema",
+                "62-year-old male"
+            ],
+            [
+                "62-year-old male",
+                "perilesional edema"
+            ],
+            [
+                "Brain MRI",
+                "unsteady gait"
+            ],
+            [
+                "unsteady gait",
+                "Brain MRI"
+            ],
+            [
+                "perilesional edema",
+                "unsteady gait"
+            ],
+            [
+                "unsteady gait",
+                "perilesional edema"
+            ],
+            [
+                "right-sided frontotemporal craniotomy",
+                "unsteady gait"
+            ],
+            [
+                "unsteady gait",
+                "right-sided frontotemporal craniotomy"
+            ],
+            [
+                "mass effect on the right lateral ventricle",
+                "perilesional edema"
+            ],
+            [
+                "perilesional edema",
+                "mass effect on the right lateral ventricle"
+            ],
+            [
+                "right-sided frontotemporal craniotomy",
+                "perilesional edema"
+            ],
+            [
+                "perilesional edema",
+                "right-sided frontotemporal craniotomy"
+            ]
+        ]
+    ],
+    "cycles": [
+        []
+    ]
+}

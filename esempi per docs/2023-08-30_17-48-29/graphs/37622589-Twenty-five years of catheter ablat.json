@@ -1,0 +1,24 @@
+{
+    "nodes": [
+        [
+            "milestone research papers",
+            "ventricular tachycardia ablation",
+            "Europace journal"
+        ]
+    ],
+    "edges": [
+        [
+            [
+                "ventricular tachycardia ablation",
+                "milestone research papers"
+            ],
+            [
+                "Europace journal",
+                "milestone research papers"
+            ]
+        ]
+    ],
+    "cycles": [
+        []
+    ]
+}

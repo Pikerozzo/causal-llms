@@ -1,0 +1,179 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 600px;
+                 background-color: #ffffff;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+
+             
+             #config {
+                 float: left;
+                 width: 400px;
+                 height: 600px;
+             }
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+        
+            <div id="config"></div>
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": "#97c2fc", "id": "weakness", "label": "weakness", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "kidney damage", "label": "kidney damage", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "bone loss", "label": "bone loss", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "cardiac arrhythmias", "label": "cardiac arrhythmias", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "fatigue", "label": "fatigue", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "nausea", "label": "nausea", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "vomiting", "label": "vomiting", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "constipation", "label": "constipation", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "abdominal pain", "label": "abdominal pain", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "confusion", "label": "confusion", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "dehydration", "label": "dehydration", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "hormone replacement therapy", "label": "hormone replacement therapy", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "hydration", "label": "hydration", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "Hypercalcemia", "label": "Hypercalcemia", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "adrenal insufficiency", "label": "adrenal insufficiency", "shape": "dot", "size": 10}, {"color": "#97c2fc", "id": "sarcoidosis", "label": "sarcoidosis", "shape": "dot", "size": 10}]);
+                  edges = new vis.DataSet([{"arrows": "to", "color": "grey", "from": "weakness", "style": "dashed", "to": "kidney damage", "width": 1}, {"arrows": "to", "color": "grey", "from": "weakness", "style": "dashed", "to": "bone loss", "width": 1}, {"arrows": "to", "color": "grey", "from": "weakness", "style": "dashed", "to": "cardiac arrhythmias", "width": 1}, {"arrows": "to", "color": "grey", "from": "weakness", "style": "dashed", "to": "fatigue", "width": 1}, {"arrows": "to", "color": "grey", "from": "weakness", "style": "dashed", "to": "nausea", "width": 1}, {"arrows": "to", "color": "grey", "from": "weakness", "style": "dashed", "to": "vomiting", "width": 1}, {"arrows": "to", "color": "grey", "from": "weakness", "style": "dashed", "to": "constipation", "width": 1}, {"arrows": "to", "color": "grey", "from": "weakness", "style": "dashed", "to": "abdominal pain", "width": 1}, {"arrows": "to", "color": "grey", "from": "weakness", "style": "dashed", "to": "confusion", "width": 1}, {"arrows": "to", "color": "grey", "from": "weakness", "style": "dashed", "to": "dehydration", "width": 1}, {"arrows": "to", "color": "grey", "from": "weakness", "style": "dashed", "to": "hormone replacement therapy", "width": 1}, {"arrows": "to", "color": "grey", "from": "weakness", "style": "dashed", "to": "hydration", "width": 1}, {"arrows": "to", "color": "grey", "from": "hormone replacement therapy", "style": "dashed", "to": "bone loss", "width": 1}, {"arrows": "to", "color": "grey", "from": "hormone replacement therapy", "style": "dashed", "to": "cardiac arrhythmias", "width": 1}, {"arrows": "to", "color": "grey", "from": "hormone replacement therapy", "style": "dashed", "to": "fatigue", "width": 1}, {"arrows": "to", "color": "grey", "from": "hormone replacement therapy", "style": "dashed", "to": "weakness", "width": 1}, {"arrows": "to", "color": "grey", "from": "hormone replacement therapy", "style": "dashed", "to": "nausea", "width": 1}, {"arrows": "to", "color": "grey", "from": "hormone replacement therapy", "style": "dashed", "to": "vomiting", "width": 1}, {"arrows": "to", "color": "grey", "from": "hormone replacement therapy", "style": "dashed", "to": "constipation", "width": 1}, {"arrows": "to", "color": "grey", "from": "hormone replacement therapy", "style": "dashed", "to": "abdominal pain", "width": 1}, {"arrows": "to", "color": "grey", "from": "hormone replacement therapy", "style": "dashed", "to": "confusion", "width": 1}, {"arrows": "to", "color": "grey", "from": "hormone replacement therapy", "style": "dashed", "to": "dehydration", "width": 1}, {"arrows": "to", "color": "black", "from": "Hypercalcemia", "style": "solid", "to": "kidney damage", "width": 1}, {"arrows": "to", "color": "black", "from": "Hypercalcemia", "style": "solid", "to": "bone loss", "width": 1}, {"arrows": "to", "color": "black", "from": "Hypercalcemia", "style": "solid", "to": "cardiac arrhythmias", "width": 1}, {"arrows": "to", "color": "black", "from": "Hypercalcemia", "style": "solid", "to": "fatigue", "width": 1}, {"arrows": "to", "color": "black", "from": "Hypercalcemia", "style": "solid", "to": "weakness", "width": 1}, {"arrows": "to", "color": "black", "from": "Hypercalcemia", "style": "solid", "to": "nausea", "width": 1}, {"arrows": "to", "color": "black", "from": "Hypercalcemia", "style": "solid", "to": "vomiting", "width": 1}, {"arrows": "to", "color": "black", "from": "Hypercalcemia", "style": "solid", "to": "constipation", "width": 1}, {"arrows": "to", "color": "black", "from": "Hypercalcemia", "style": "solid", "to": "abdominal pain", "width": 1}, {"arrows": "to", "color": "black", "from": "Hypercalcemia", "style": "solid", "to": "confusion", "width": 1}, {"arrows": "to", "color": "black", "from": "Hypercalcemia", "style": "solid", "to": "dehydration", "width": 1}, {"arrows": "to", "color": "black", "from": "Hypercalcemia", "style": "solid", "to": "hormone replacement therapy", "width": 1}, {"arrows": "to", "color": "grey", "from": "nausea", "style": "dashed", "to": "kidney damage", "width": 1}, {"arrows": "to", "color": "grey", "from": "nausea", "style": "dashed", "to": "bone loss", "width": 1}, {"arrows": "to", "color": "grey", "from": "nausea", "style": "dashed", "to": "cardiac arrhythmias", "width": 1}, {"arrows": "to", "color": "grey", "from": "nausea", "style": "dashed", "to": "fatigue", "width": 1}, {"arrows": "to", "color": "grey", "from": "nausea", "style": "dashed", "to": "weakness", "width": 1}, {"arrows": "to", "color": "grey", "from": "nausea", "style": "dashed", "to": "vomiting", "width": 1}, {"arrows": "to", "color": "grey", "from": "nausea", "style": "dashed", "to": "constipation", "width": 1}, {"arrows": "to", "color": "grey", "from": "nausea", "style": "dashed", "to": "abdominal pain", "width": 1}, {"arrows": "to", "color": "grey", "from": "nausea", "style": "dashed", "to": "confusion", "width": 1}, {"arrows": "to", "color": "grey", "from": "nausea", "style": "dashed", "to": "dehydration", "width": 1}, {"arrows": "to", "color": "grey", "from": "nausea", "style": "dashed", "to": "hormone replacement therapy", "width": 1}, {"arrows": "to", "color": "grey", "from": "confusion", "style": "dashed", "to": "kidney damage", "width": 1}, {"arrows": "to", "color": "grey", "from": "confusion", "style": "dashed", "to": "bone loss", "width": 1}, {"arrows": "to", "color": "grey", "from": "confusion", "style": "dashed", "to": "cardiac arrhythmias", "width": 1}, {"arrows": "to", "color": "grey", "from": "confusion", "style": "dashed", "to": "fatigue", "width": 1}, {"arrows": "to", "color": "grey", "from": "confusion", "style": "dashed", "to": "weakness", "width": 1}, {"arrows": "to", "color": "grey", "from": "confusion", "style": "dashed", "to": "nausea", "width": 1}, {"arrows": "to", "color": "grey", "from": "confusion", "style": "dashed", "to": "vomiting", "width": 1}, {"arrows": "to", "color": "grey", "from": "confusion", "style": "dashed", "to": "constipation", "width": 1}, {"arrows": "to", "color": "grey", "from": "confusion", "style": "dashed", "to": "abdominal pain", "width": 1}, {"arrows": "to", "color": "grey", "from": "confusion", "style": "dashed", "to": "dehydration", "width": 1}, {"arrows": "to", "color": "grey", "from": "confusion", "style": "dashed", "to": "hormone replacement therapy", "width": 1}, {"arrows": "to", "color": "grey", "from": "confusion", "style": "dashed", "to": "hydration", "width": 1}, {"arrows": "to", "color": "black", "from": "vomiting", "style": "solid", "to": "dehydration", "width": 1}, {"arrows": "to", "color": "grey", "from": "vomiting", "style": "dashed", "to": "kidney damage", "width": 1}, {"arrows": "to", "color": "grey", "from": "vomiting", "style": "dashed", "to": "bone loss", "width": 1}, {"arrows": "to", "color": "grey", "from": "vomiting", "style": "dashed", "to": "cardiac arrhythmias", "width": 1}, {"arrows": "to", "color": "grey", "from": "vomiting", "style": "dashed", "to": "fatigue", "width": 1}, {"arrows": "to", "color": "grey", "from": "vomiting", "style": "dashed", "to": "weakness", "width": 1}, {"arrows": "to", "color": "grey", "from": "vomiting", "style": "dashed", "to": "nausea", "width": 1}, {"arrows": "to", "color": "grey", "from": "vomiting", "style": "dashed", "to": "constipation", "width": 1}, {"arrows": "to", "color": "grey", "from": "vomiting", "style": "dashed", "to": "abdominal pain", "width": 1}, {"arrows": "to", "color": "grey", "from": "vomiting", "style": "dashed", "to": "confusion", "width": 1}, {"arrows": "to", "color": "grey", "from": "vomiting", "style": "dashed", "to": "hormone replacement therapy", "width": 1}, {"arrows": "to", "color": "grey", "from": "vomiting", "style": "dashed", "to": "hydration", "width": 1}, {"arrows": "to", "color": "grey", "from": "abdominal pain", "style": "dashed", "to": "kidney damage", "width": 1}, {"arrows": "to", "color": "grey", "from": "abdominal pain", "style": "dashed", "to": "bone loss", "width": 1}, {"arrows": "to", "color": "grey", "from": "abdominal pain", "style": "dashed", "to": "cardiac arrhythmias", "width": 1}, {"arrows": "to", "color": "grey", "from": "abdominal pain", "style": "dashed", "to": "fatigue", "width": 1}, {"arrows": "to", "color": "grey", "from": "abdominal pain", "style": "dashed", "to": "weakness", "width": 1}, {"arrows": "to", "color": "grey", "from": "abdominal pain", "style": "dashed", "to": "nausea", "width": 1}, {"arrows": "to", "color": "grey", "from": "abdominal pain", "style": "dashed", "to": "vomiting", "width": 1}, {"arrows": "to", "color": "grey", "from": "abdominal pain", "style": "dashed", "to": "constipation", "width": 1}, {"arrows": "to", "color": "grey", "from": "abdominal pain", "style": "dashed", "to": "confusion", "width": 1}, {"arrows": "to", "color": "grey", "from": "abdominal pain", "style": "dashed", "to": "dehydration", "width": 1}, {"arrows": "to", "color": "grey", "from": "abdominal pain", "style": "dashed", "to": "hormone replacement therapy", "width": 1}, {"arrows": "to", "color": "grey", "from": "abdominal pain", "style": "dashed", "to": "hydration", "width": 1}, {"arrows": "to", "color": "grey", "from": "dehydration", "style": "dashed", "to": "kidney damage", "width": 1}, {"arrows": "to", "color": "grey", "from": "dehydration", "style": "dashed", "to": "bone loss", "width": 1}, {"arrows": "to", "color": "grey", "from": "dehydration", "style": "dashed", "to": "cardiac arrhythmias", "width": 1}, {"arrows": "to", "color": "grey", "from": "dehydration", "style": "dashed", "to": "fatigue", "width": 1}, {"arrows": "to", "color": "grey", "from": "dehydration", "style": "dashed", "to": "weakness", "width": 1}, {"arrows": "to", "color": "grey", "from": "dehydration", "style": "dashed", "to": "nausea", "width": 1}, {"arrows": "to", "color": "grey", "from": "dehydration", "style": "dashed", "to": "constipation", "width": 1}, {"arrows": "to", "color": "grey", "from": "dehydration", "style": "dashed", "to": "abdominal pain", "width": 1}, {"arrows": "to", "color": "grey", "from": "dehydration", "style": "dashed", "to": "confusion", "width": 1}, {"arrows": "to", "color": "grey", "from": "dehydration", "style": "dashed", "to": "hormone replacement therapy", "width": 1}, {"arrows": "to", "color": "grey", "from": "constipation", "style": "dashed", "to": "kidney damage", "width": 1}, {"arrows": "to", "color": "grey", "from": "constipation", "style": "dashed", "to": "bone loss", "width": 1}, {"arrows": "to", "color": "grey", "from": "constipation", "style": "dashed", "to": "cardiac arrhythmias", "width": 1}, {"arrows": "to", "color": "grey", "from": "constipation", "style": "dashed", "to": "fatigue", "width": 1}, {"arrows": "to", "color": "grey", "from": "constipation", "style": "dashed", "to": "weakness", "width": 1}, {"arrows": "to", "color": "grey", "from": "constipation", "style": "dashed", "to": "nausea", "width": 1}, {"arrows": "to", "color": "grey", "from": "constipation", "style": "dashed", "to": "vomiting", "width": 1}, {"arrows": "to", "color": "grey", "from": "constipation", "style": "dashed", "to": "abdominal pain", "width": 1}, {"arrows": "to", "color": "grey", "from": "constipation", "style": "dashed", "to": "confusion", "width": 1}, {"arrows": "to", "color": "grey", "from": "constipation", "style": "dashed", "to": "dehydration", "width": 1}, {"arrows": "to", "color": "grey", "from": "constipation", "style": "dashed", "to": "hormone replacement therapy", "width": 1}, {"arrows": "to", "color": "grey", "from": "cardiac arrhythmias", "style": "dashed", "to": "kidney damage", "width": 1}, {"arrows": "to", "color": "grey", "from": "cardiac arrhythmias", "style": "dashed", "to": "bone loss", "width": 1}, {"arrows": "to", "color": "grey", "from": "cardiac arrhythmias", "style": "dashed", "to": "fatigue", "width": 1}, {"arrows": "to", "color": "grey", "from": "cardiac arrhythmias", "style": "dashed", "to": "weakness", "width": 1}, {"arrows": "to", "color": "grey", "from": "cardiac arrhythmias", "style": "dashed", "to": "nausea", "width": 1}, {"arrows": "to", "color": "grey", "from": "cardiac arrhythmias", "style": "dashed", "to": "vomiting", "width": 1}, {"arrows": "to", "color": "grey", "from": "cardiac arrhythmias", "style": "dashed", "to": "constipation", "width": 1}, {"arrows": "to", "color": "grey", "from": "cardiac arrhythmias", "style": "dashed", "to": "abdominal pain", "width": 1}, {"arrows": "to", "color": "grey", "from": "cardiac arrhythmias", "style": "dashed", "to": "confusion", "width": 1}, {"arrows": "to", "color": "grey", "from": "cardiac arrhythmias", "style": "dashed", "to": "dehydration", "width": 1}, {"arrows": "to", "color": "grey", "from": "cardiac arrhythmias", "style": "dashed", "to": "hormone replacement therapy", "width": 1}, {"arrows": "to", "color": "grey", "from": "kidney damage", "style": "dashed", "to": "bone loss", "width": 1}, {"arrows": "to", "color": "grey", "from": "kidney damage", "style": "dashed", "to": "cardiac arrhythmias", "width": 1}, {"arrows": "to", "color": "grey", "from": "kidney damage", "style": "dashed", "to": "fatigue", "width": 1}, {"arrows": "to", "color": "grey", "from": "kidney damage", "style": "dashed", "to": "weakness", "width": 1}, {"arrows": "to", "color": "grey", "from": "kidney damage", "style": "dashed", "to": "nausea", "width": 1}, {"arrows": "to", "color": "grey", "from": "kidney damage", "style": "dashed", "to": "vomiting", "width": 1}, {"arrows": "to", "color": "grey", "from": "kidney damage", "style": "dashed", "to": "constipation", "width": 1}, {"arrows": "to", "color": "grey", "from": "kidney damage", "style": "dashed", "to": "abdominal pain", "width": 1}, {"arrows": "to", "color": "grey", "from": "kidney damage", "style": "dashed", "to": "confusion", "width": 1}, {"arrows": "to", "color": "grey", "from": "kidney damage", "style": "dashed", "to": "dehydration", "width": 1}, {"arrows": "to", "color": "grey", "from": "hydration", "style": "dashed", "to": "fatigue", "width": 1}, {"arrows": "to", "color": "grey", "from": "hydration", "style": "dashed", "to": "weakness", "width": 1}, {"arrows": "to", "color": "grey", "from": "hydration", "style": "dashed", "to": "vomiting", "width": 1}, {"arrows": "to", "color": "grey", "from": "hydration", "style": "dashed", "to": "abdominal pain", "width": 1}, {"arrows": "to", "color": "grey", "from": "hydration", "style": "dashed", "to": "confusion", "width": 1}, {"arrows": "to", "color": "black", "from": "adrenal insufficiency", "style": "solid", "to": "Hypercalcemia", "width": 1}, {"arrows": "to", "color": "black", "from": "adrenal insufficiency", "style": "solid", "to": "kidney damage", "width": 1}, {"arrows": "to", "color": "black", "from": "adrenal insufficiency", "style": "solid", "to": "bone loss", "width": 1}, {"arrows": "to", "color": "black", "from": "adrenal insufficiency", "style": "solid", "to": "cardiac arrhythmias", "width": 1}, {"arrows": "to", "color": "black", "from": "adrenal insufficiency", "style": "solid", "to": "fatigue", "width": 1}, {"arrows": "to", "color": "black", "from": "adrenal insufficiency", "style": "solid", "to": "weakness", "width": 1}, {"arrows": "to", "color": "black", "from": "adrenal insufficiency", "style": "solid", "to": "nausea", "width": 1}, {"arrows": "to", "color": "black", "from": "adrenal insufficiency", "style": "solid", "to": "vomiting", "width": 1}, {"arrows": "to", "color": "black", "from": "adrenal insufficiency", "style": "solid", "to": "constipation", "width": 1}, {"arrows": "to", "color": "black", "from": "adrenal insufficiency", "style": "solid", "to": "abdominal pain", "width": 1}, {"arrows": "to", "color": "black", "from": "adrenal insufficiency", "style": "solid", "to": "confusion", "width": 1}, {"arrows": "to", "color": "black", "from": "adrenal insufficiency", "style": "solid", "to": "dehydration", "width": 1}, {"arrows": "to", "color": "black", "from": "adrenal insufficiency", "style": "solid", "to": "hormone replacement therapy", "width": 1}, {"arrows": "to", "color": "black", "from": "adrenal insufficiency", "style": "solid", "to": "hydration", "width": 1}, {"arrows": "to", "color": "grey", "from": "fatigue", "style": "dashed", "to": "kidney damage", "width": 1}, {"arrows": "to", "color": "grey", "from": "fatigue", "style": "dashed", "to": "bone loss", "width": 1}, {"arrows": "to", "color": "grey", "from": "fatigue", "style": "dashed", "to": "cardiac arrhythmias", "width": 1}, {"arrows": "to", "color": "grey", "from": "fatigue", "style": "dashed", "to": "weakness", "width": 1}, {"arrows": "to", "color": "grey", "from": "fatigue", "style": "dashed", "to": "nausea", "width": 1}, {"arrows": "to", "color": "grey", "from": "fatigue", "style": "dashed", "to": "vomiting", "width": 1}, {"arrows": "to", "color": "grey", "from": "fatigue", "style": "dashed", "to": "constipation", "width": 1}, {"arrows": "to", "color": "grey", "from": "fatigue", "style": "dashed", "to": "abdominal pain", "width": 1}, {"arrows": "to", "color": "grey", "from": "fatigue", "style": "dashed", "to": "confusion", "width": 1}, {"arrows": "to", "color": "grey", "from": "fatigue", "style": "dashed", "to": "dehydration", "width": 1}, {"arrows": "to", "color": "grey", "from": "fatigue", "style": "dashed", "to": "hormone replacement therapy", "width": 1}, {"arrows": "to", "color": "grey", "from": "fatigue", "style": "dashed", "to": "hydration", "width": 1}, {"arrows": "to", "color": "grey", "from": "bone loss", "style": "dashed", "to": "kidney damage", "width": 1}, {"arrows": "to", "color": "grey", "from": "bone loss", "style": "dashed", "to": "cardiac arrhythmias", "width": 1}, {"arrows": "to", "color": "grey", "from": "bone loss", "style": "dashed", "to": "fatigue", "width": 1}, {"arrows": "to", "color": "grey", "from": "bone loss", "style": "dashed", "to": "weakness", "width": 1}, {"arrows": "to", "color": "grey", "from": "bone loss", "style": "dashed", "to": "nausea", "width": 1}, {"arrows": "to", "color": "grey", "from": "bone loss", "style": "dashed", "to": "vomiting", "width": 1}, {"arrows": "to", "color": "grey", "from": "bone loss", "style": "dashed", "to": "constipation", "width": 1}, {"arrows": "to", "color": "grey", "from": "bone loss", "style": "dashed", "to": "abdominal pain", "width": 1}, {"arrows": "to", "color": "grey", "from": "bone loss", "style": "dashed", "to": "confusion", "width": 1}, {"arrows": "to", "color": "grey", "from": "bone loss", "style": "dashed", "to": "dehydration", "width": 1}, {"arrows": "to", "color": "grey", "from": "bone loss", "style": "dashed", "to": "hormone replacement therapy", "width": 1}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {
+    "configure": {
+        "enabled": true,
+        "filter": [
+            "physics"
+        ]
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "dynamic"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "enabled": true,
+        "forceAtlas2Based": {
+            "avoidOverlap": 0,
+            "centralGravity": 0.01,
+            "damping": 0.4,
+            "gravitationalConstant": -50,
+            "springConstant": 0.08,
+            "springLength": 100
+        },
+        "solver": "forceAtlas2Based",
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+
+                  
+
+
+                  
+                  // if this network requires displaying the configure window,
+                  // put it in its div
+                  options.configure["container"] = document.getElementById("config");
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>

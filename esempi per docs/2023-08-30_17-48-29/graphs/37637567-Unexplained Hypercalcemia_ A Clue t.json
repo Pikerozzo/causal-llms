@@ -1,0 +1,689 @@
+{
+    "nodes": [
+        [
+            "weakness",
+            "hormone replacement therapy",
+            "sarcoidosis",
+            "Hypercalcemia",
+            "nausea",
+            "confusion",
+            "vomiting",
+            "abdominal pain",
+            "dehydration",
+            "constipation",
+            "cardiac arrhythmias",
+            "kidney damage",
+            "hydration",
+            "adrenal insufficiency",
+            "fatigue",
+            "bone loss"
+        ]
+    ],
+    "edges": [
+        [
+            [
+                "adrenal insufficiency",
+                "Hypercalcemia"
+            ],
+            [
+                "Hypercalcemia",
+                "kidney damage"
+            ],
+            [
+                "Hypercalcemia",
+                "bone loss"
+            ],
+            [
+                "Hypercalcemia",
+                "cardiac arrhythmias"
+            ],
+            [
+                "Hypercalcemia",
+                "fatigue"
+            ],
+            [
+                "Hypercalcemia",
+                "weakness"
+            ],
+            [
+                "Hypercalcemia",
+                "nausea"
+            ],
+            [
+                "Hypercalcemia",
+                "vomiting"
+            ],
+            [
+                "Hypercalcemia",
+                "constipation"
+            ],
+            [
+                "Hypercalcemia",
+                "abdominal pain"
+            ],
+            [
+                "Hypercalcemia",
+                "confusion"
+            ],
+            [
+                "Hypercalcemia",
+                "dehydration"
+            ],
+            [
+                "Hypercalcemia",
+                "hormone replacement therapy"
+            ],
+            [
+                "adrenal insufficiency",
+                "kidney damage"
+            ],
+            [
+                "adrenal insufficiency",
+                "bone loss"
+            ],
+            [
+                "adrenal insufficiency",
+                "cardiac arrhythmias"
+            ],
+            [
+                "adrenal insufficiency",
+                "fatigue"
+            ],
+            [
+                "adrenal insufficiency",
+                "weakness"
+            ],
+            [
+                "adrenal insufficiency",
+                "nausea"
+            ],
+            [
+                "adrenal insufficiency",
+                "vomiting"
+            ],
+            [
+                "adrenal insufficiency",
+                "constipation"
+            ],
+            [
+                "adrenal insufficiency",
+                "abdominal pain"
+            ],
+            [
+                "adrenal insufficiency",
+                "confusion"
+            ],
+            [
+                "adrenal insufficiency",
+                "dehydration"
+            ],
+            [
+                "adrenal insufficiency",
+                "hormone replacement therapy"
+            ],
+            [
+                "adrenal insufficiency",
+                "hydration"
+            ],
+            [
+                "vomiting",
+                "dehydration"
+            ],
+            [
+                "bone loss",
+                "kidney damage"
+            ],
+            [
+                "kidney damage",
+                "bone loss"
+            ],
+            [
+                "cardiac arrhythmias",
+                "kidney damage"
+            ],
+            [
+                "kidney damage",
+                "cardiac arrhythmias"
+            ],
+            [
+                "fatigue",
+                "kidney damage"
+            ],
+            [
+                "kidney damage",
+                "fatigue"
+            ],
+            [
+                "weakness",
+                "kidney damage"
+            ],
+            [
+                "kidney damage",
+                "weakness"
+            ],
+            [
+                "nausea",
+                "kidney damage"
+            ],
+            [
+                "kidney damage",
+                "nausea"
+            ],
+            [
+                "vomiting",
+                "kidney damage"
+            ],
+            [
+                "kidney damage",
+                "vomiting"
+            ],
+            [
+                "constipation",
+                "kidney damage"
+            ],
+            [
+                "kidney damage",
+                "constipation"
+            ],
+            [
+                "abdominal pain",
+                "kidney damage"
+            ],
+            [
+                "kidney damage",
+                "abdominal pain"
+            ],
+            [
+                "confusion",
+                "kidney damage"
+            ],
+            [
+                "kidney damage",
+                "confusion"
+            ],
+            [
+                "dehydration",
+                "kidney damage"
+            ],
+            [
+                "kidney damage",
+                "dehydration"
+            ],
+            [
+                "cardiac arrhythmias",
+                "bone loss"
+            ],
+            [
+                "bone loss",
+                "cardiac arrhythmias"
+            ],
+            [
+                "fatigue",
+                "bone loss"
+            ],
+            [
+                "bone loss",
+                "fatigue"
+            ],
+            [
+                "weakness",
+                "bone loss"
+            ],
+            [
+                "bone loss",
+                "weakness"
+            ],
+            [
+                "nausea",
+                "bone loss"
+            ],
+            [
+                "bone loss",
+                "nausea"
+            ],
+            [
+                "vomiting",
+                "bone loss"
+            ],
+            [
+                "bone loss",
+                "vomiting"
+            ],
+            [
+                "constipation",
+                "bone loss"
+            ],
+            [
+                "bone loss",
+                "constipation"
+            ],
+            [
+                "abdominal pain",
+                "bone loss"
+            ],
+            [
+                "bone loss",
+                "abdominal pain"
+            ],
+            [
+                "confusion",
+                "bone loss"
+            ],
+            [
+                "bone loss",
+                "confusion"
+            ],
+            [
+                "dehydration",
+                "bone loss"
+            ],
+            [
+                "bone loss",
+                "dehydration"
+            ],
+            [
+                "hormone replacement therapy",
+                "bone loss"
+            ],
+            [
+                "bone loss",
+                "hormone replacement therapy"
+            ],
+            [
+                "fatigue",
+                "cardiac arrhythmias"
+            ],
+            [
+                "cardiac arrhythmias",
+                "fatigue"
+            ],
+            [
+                "weakness",
+                "cardiac arrhythmias"
+            ],
+            [
+                "cardiac arrhythmias",
+                "weakness"
+            ],
+            [
+                "nausea",
+                "cardiac arrhythmias"
+            ],
+            [
+                "cardiac arrhythmias",
+                "nausea"
+            ],
+            [
+                "vomiting",
+                "cardiac arrhythmias"
+            ],
+            [
+                "cardiac arrhythmias",
+                "vomiting"
+            ],
+            [
+                "constipation",
+                "cardiac arrhythmias"
+            ],
+            [
+                "cardiac arrhythmias",
+                "constipation"
+            ],
+            [
+                "abdominal pain",
+                "cardiac arrhythmias"
+            ],
+            [
+                "cardiac arrhythmias",
+                "abdominal pain"
+            ],
+            [
+                "confusion",
+                "cardiac arrhythmias"
+            ],
+            [
+                "cardiac arrhythmias",
+                "confusion"
+            ],
+            [
+                "dehydration",
+                "cardiac arrhythmias"
+            ],
+            [
+                "cardiac arrhythmias",
+                "dehydration"
+            ],
+            [
+                "hormone replacement therapy",
+                "cardiac arrhythmias"
+            ],
+            [
+                "cardiac arrhythmias",
+                "hormone replacement therapy"
+            ],
+            [
+                "weakness",
+                "fatigue"
+            ],
+            [
+                "fatigue",
+                "weakness"
+            ],
+            [
+                "nausea",
+                "fatigue"
+            ],
+            [
+                "fatigue",
+                "nausea"
+            ],
+            [
+                "vomiting",
+                "fatigue"
+            ],
+            [
+                "fatigue",
+                "vomiting"
+            ],
+            [
+                "constipation",
+                "fatigue"
+            ],
+            [
+                "fatigue",
+                "constipation"
+            ],
+            [
+                "abdominal pain",
+                "fatigue"
+            ],
+            [
+                "fatigue",
+                "abdominal pain"
+            ],
+            [
+                "confusion",
+                "fatigue"
+            ],
+            [
+                "fatigue",
+                "confusion"
+            ],
+            [
+                "dehydration",
+                "fatigue"
+            ],
+            [
+                "fatigue",
+                "dehydration"
+            ],
+            [
+                "hormone replacement therapy",
+                "fatigue"
+            ],
+            [
+                "fatigue",
+                "hormone replacement therapy"
+            ],
+            [
+                "hydration",
+                "fatigue"
+            ],
+            [
+                "fatigue",
+                "hydration"
+            ],
+            [
+                "nausea",
+                "weakness"
+            ],
+            [
+                "weakness",
+                "nausea"
+            ],
+            [
+                "vomiting",
+                "weakness"
+            ],
+            [
+                "weakness",
+                "vomiting"
+            ],
+            [
+                "constipation",
+                "weakness"
+            ],
+            [
+                "weakness",
+                "constipation"
+            ],
+            [
+                "abdominal pain",
+                "weakness"
+            ],
+            [
+                "weakness",
+                "abdominal pain"
+            ],
+            [
+                "confusion",
+                "weakness"
+            ],
+            [
+                "weakness",
+                "confusion"
+            ],
+            [
+                "dehydration",
+                "weakness"
+            ],
+            [
+                "weakness",
+                "dehydration"
+            ],
+            [
+                "hormone replacement therapy",
+                "weakness"
+            ],
+            [
+                "weakness",
+                "hormone replacement therapy"
+            ],
+            [
+                "hydration",
+                "weakness"
+            ],
+            [
+                "weakness",
+                "hydration"
+            ],
+            [
+                "vomiting",
+                "nausea"
+            ],
+            [
+                "nausea",
+                "vomiting"
+            ],
+            [
+                "constipation",
+                "nausea"
+            ],
+            [
+                "nausea",
+                "constipation"
+            ],
+            [
+                "abdominal pain",
+                "nausea"
+            ],
+            [
+                "nausea",
+                "abdominal pain"
+            ],
+            [
+                "confusion",
+                "nausea"
+            ],
+            [
+                "nausea",
+                "confusion"
+            ],
+            [
+                "dehydration",
+                "nausea"
+            ],
+            [
+                "nausea",
+                "dehydration"
+            ],
+            [
+                "hormone replacement therapy",
+                "nausea"
+            ],
+            [
+                "nausea",
+                "hormone replacement therapy"
+            ],
+            [
+                "constipation",
+                "vomiting"
+            ],
+            [
+                "vomiting",
+                "constipation"
+            ],
+            [
+                "abdominal pain",
+                "vomiting"
+            ],
+            [
+                "vomiting",
+                "abdominal pain"
+            ],
+            [
+                "confusion",
+                "vomiting"
+            ],
+            [
+                "vomiting",
+                "confusion"
+            ],
+            [
+                "hormone replacement therapy",
+                "vomiting"
+            ],
+            [
+                "vomiting",
+                "hormone replacement therapy"
+            ],
+            [
+                "hydration",
+                "vomiting"
+            ],
+            [
+                "vomiting",
+                "hydration"
+            ],
+            [
+                "abdominal pain",
+                "constipation"
+            ],
+            [
+                "constipation",
+                "abdominal pain"
+            ],
+            [
+                "confusion",
+                "constipation"
+            ],
+            [
+                "constipation",
+                "confusion"
+            ],
+            [
+                "dehydration",
+                "constipation"
+            ],
+            [
+                "constipation",
+                "dehydration"
+            ],
+            [
+                "hormone replacement therapy",
+                "constipation"
+            ],
+            [
+                "constipation",
+                "hormone replacement therapy"
+            ],
+            [
+                "confusion",
+                "abdominal pain"
+            ],
+            [
+                "abdominal pain",
+                "confusion"
+            ],
+            [
+                "dehydration",
+                "abdominal pain"
+            ],
+            [
+                "abdominal pain",
+                "dehydration"
+            ],
+            [
+                "hormone replacement therapy",
+                "abdominal pain"
+            ],
+            [
+                "abdominal pain",
+                "hormone replacement therapy"
+            ],
+            [
+                "hydration",
+                "abdominal pain"
+            ],
+            [
+                "abdominal pain",
+                "hydration"
+            ],
+            [
+                "dehydration",
+                "confusion"
+            ],
+            [
+                "confusion",
+                "dehydration"
+            ],
+            [
+                "hormone replacement therapy",
+                "confusion"
+            ],
+            [
+                "confusion",
+                "hormone replacement therapy"
+            ],
+            [
+                "hydration",
+                "confusion"
+            ],
+            [
+                "confusion",
+                "hydration"
+            ],
+            [
+                "hormone replacement therapy",
+                "dehydration"
+            ],
+            [
+                "dehydration",
+                "hormone replacement therapy"
+            ]
+        ]
+    ],
+    "cycles": [
+        []
+    ]
+}

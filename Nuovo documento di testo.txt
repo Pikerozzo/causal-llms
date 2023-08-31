@@ -50,3 +50,36 @@ DISCUSSION:
 CONCLUSIONS:
  **docs project summary**
  future work
+
+
+
+
+chap 3 - Backgoround
+chap 4 - MEthodology And implementation
+unire 5 e 6 ?
+una ref ha "visitato il" invece che "accessed"
+controllare ref per iniziali nomi autori
+togliere doi e url
+dire che benchmark results sono solo alcune delle metriche (alrte in appendice)
+niente wikipedia (es per openAI mettere direttamente sito openAI)
+calcolare accuracy benchmarks + riportare risultati (accuracy) di "Can LLMS build causal graphs?", ref #3
+dimensioni dei grafi delle benchmark
+footnote per referenze che uso solo una volta (spacy, guide)
+aggiungere una decina di abstract grafi  (per gli abstract più corti che ci sono) SALVARE ANCHE EXEC_TIME !!
+
+
+
+
+baseline: 	0.20
+got3: 		0.61
+gpt4: 		0.86
+
+
+
+
+
+in tabelle, numeri allineati a destra. 2 decimali
+
+
+
+RIMETTERE FONT DEL POSTER

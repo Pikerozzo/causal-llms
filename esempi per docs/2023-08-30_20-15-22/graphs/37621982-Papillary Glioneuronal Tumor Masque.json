@@ -1,0 +1,170 @@
+{
+    "nodes": [
+        [
+            "peritumoral brain edema",
+            "acute headache",
+            "malignant brain tumors",
+            "synaptophysin-positive neurons",
+            "Papillary glioneuronal tumor (PGNT)",
+            "decreased perfusion",
+            "right occipital lobe",
+            "left homonymous hemianopsia",
+            "arterial spin labeling MRI",
+            "intraoperative fluorescence staining",
+            "glial fibrillary acidic protein (GFAP)-positive glial cells",
+            "intratumoral hemorrhage",
+            "48-year-old woman"
+        ]
+    ],
+    "edges": [
+        [
+            [
+                "Papillary glioneuronal tumor (PGNT)",
+                "acute headache"
+            ],
+            [
+                "Papillary glioneuronal tumor (PGNT)",
+                "left homonymous hemianopsia"
+            ],
+            [
+                "Papillary glioneuronal tumor (PGNT)",
+                "peritumoral brain edema"
+            ],
+            [
+                "Papillary glioneuronal tumor (PGNT)",
+                "intratumoral hemorrhage"
+            ],
+            [
+                "Papillary glioneuronal tumor (PGNT)",
+                "intraoperative fluorescence staining"
+            ],
+            [
+                "Papillary glioneuronal tumor (PGNT)",
+                "decreased perfusion"
+            ],
+            [
+                "glial fibrillary acidic protein (GFAP)-positive glial cells",
+                "left homonymous hemianopsia"
+            ],
+            [
+                "right occipital lobe",
+                "acute headache"
+            ],
+            [
+                "right occipital lobe",
+                "left homonymous hemianopsia"
+            ],
+            [
+                "right occipital lobe",
+                "peritumoral brain edema"
+            ],
+            [
+                "peritumoral brain edema",
+                "acute headache"
+            ],
+            [
+                "intratumoral hemorrhage",
+                "acute headache"
+            ],
+            [
+                "malignant brain tumors",
+                "peritumoral brain edema"
+            ],
+            [
+                "decreased perfusion",
+                "arterial spin labeling MRI"
+            ],
+            [
+                "peritumoral brain edema",
+                "synaptophysin-positive neurons"
+            ],
+            [
+                "synaptophysin-positive neurons",
+                "peritumoral brain edema"
+            ],
+            [
+                "intratumoral hemorrhage",
+                "right occipital lobe"
+            ],
+            [
+                "right occipital lobe",
+                "intratumoral hemorrhage"
+            ],
+            [
+                "peritumoral brain edema",
+                "48-year-old woman"
+            ],
+            [
+                "48-year-old woman",
+                "peritumoral brain edema"
+            ],
+            [
+                "left homonymous hemianopsia",
+                "acute headache"
+            ],
+            [
+                "acute headache",
+                "left homonymous hemianopsia"
+            ],
+            [
+                "decreased perfusion",
+                "acute headache"
+            ],
+            [
+                "acute headache",
+                "decreased perfusion"
+            ],
+            [
+                "peritumoral brain edema",
+                "left homonymous hemianopsia"
+            ],
+            [
+                "left homonymous hemianopsia",
+                "peritumoral brain edema"
+            ],
+            [
+                "intratumoral hemorrhage",
+                "left homonymous hemianopsia"
+            ],
+            [
+                "left homonymous hemianopsia",
+                "intratumoral hemorrhage"
+            ],
+            [
+                "decreased perfusion",
+                "left homonymous hemianopsia"
+            ],
+            [
+                "left homonymous hemianopsia",
+                "decreased perfusion"
+            ],
+            [
+                "intratumoral hemorrhage",
+                "peritumoral brain edema"
+            ],
+            [
+                "peritumoral brain edema",
+                "intratumoral hemorrhage"
+            ],
+            [
+                "decreased perfusion",
+                "peritumoral brain edema"
+            ],
+            [
+                "peritumoral brain edema",
+                "decreased perfusion"
+            ],
+            [
+                "decreased perfusion",
+                "intratumoral hemorrhage"
+            ],
+            [
+                "intratumoral hemorrhage",
+                "decreased perfusion"
+            ]
+        ]
+    ],
+    "cycles": [
+        []
+    ]
+}
