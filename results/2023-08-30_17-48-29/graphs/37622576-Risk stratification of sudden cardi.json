@@ -1,0 +1,75 @@
+{
+    "nodes": [
+        [
+            "treatment strategies",
+            "primary electric diseases",
+            "Sudden cardiac death (SCD)",
+            "high-risk individuals",
+            "underlying disease",
+            "disease-specific risk stratification"
+        ]
+    ],
+    "edges": [
+        [
+            [
+                "high-risk individuals",
+                "Sudden cardiac death (SCD)"
+            ],
+            [
+                "Sudden cardiac death (SCD)",
+                "disease-specific risk stratification"
+            ],
+            [
+                "Sudden cardiac death (SCD)",
+                "treatment strategies"
+            ],
+            [
+                "underlying disease",
+                "Sudden cardiac death (SCD)"
+            ],
+            [
+                "primary electric diseases",
+                "Sudden cardiac death (SCD)"
+            ],
+            [
+                "high-risk individuals",
+                "disease-specific risk stratification"
+            ],
+            [
+                "high-risk individuals",
+                "treatment strategies"
+            ],
+            [
+                "underlying disease",
+                "high-risk individuals"
+            ],
+            [
+                "primary electric diseases",
+                "high-risk individuals"
+            ],
+            [
+                "disease-specific risk stratification",
+                "treatment strategies"
+            ],
+            [
+                "underlying disease",
+                "disease-specific risk stratification"
+            ],
+            [
+                "primary electric diseases",
+                "disease-specific risk stratification"
+            ],
+            [
+                "underlying disease",
+                "treatment strategies"
+            ],
+            [
+                "primary electric diseases",
+                "treatment strategies"
+            ]
+        ]
+    ],
+    "cycles": [
+        []
+    ]
+}

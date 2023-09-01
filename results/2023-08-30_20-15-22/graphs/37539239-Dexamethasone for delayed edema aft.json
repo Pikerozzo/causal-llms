@@ -1,0 +1,227 @@
+{
+    "nodes": [
+        [
+            "subdural effusion",
+            "nerve injury",
+            "routine medication",
+            "dexamethasone",
+            "KLF2 expression",
+            "neuroinflammatory response",
+            "NF-\u03baB pathway",
+            "intracerebral hemorrhage",
+            "ZO-1",
+            "delayed cerebral edema",
+            "chronic subdural hematoma",
+            "blood-brain barrier"
+        ]
+    ],
+    "edges": [
+        [
+            [
+                "intracerebral hemorrhage",
+                "delayed cerebral edema"
+            ],
+            [
+                "subdural effusion",
+                "delayed cerebral edema"
+            ],
+            [
+                "delayed cerebral edema",
+                "dexamethasone"
+            ],
+            [
+                "delayed cerebral edema",
+                "routine medication"
+            ],
+            [
+                "NF-\u03baB pathway",
+                "delayed cerebral edema"
+            ],
+            [
+                "delayed cerebral edema",
+                "nerve injury"
+            ],
+            [
+                "intracerebral hemorrhage",
+                "subdural effusion"
+            ],
+            [
+                "intracerebral hemorrhage",
+                "dexamethasone"
+            ],
+            [
+                "intracerebral hemorrhage",
+                "routine medication"
+            ],
+            [
+                "intracerebral hemorrhage",
+                "neuroinflammatory response"
+            ],
+            [
+                "intracerebral hemorrhage",
+                "NF-\u03baB pathway"
+            ],
+            [
+                "intracerebral hemorrhage",
+                "nerve injury"
+            ],
+            [
+                "subdural effusion",
+                "dexamethasone"
+            ],
+            [
+                "chronic subdural hematoma",
+                "routine medication"
+            ],
+            [
+                "dexamethasone",
+                "blood-brain barrier"
+            ],
+            [
+                "dexamethasone",
+                "ZO-1"
+            ],
+            [
+                "dexamethasone",
+                "neuroinflammatory response"
+            ],
+            [
+                "dexamethasone",
+                "NF-\u03baB pathway"
+            ],
+            [
+                "dexamethasone",
+                "KLF2 expression"
+            ],
+            [
+                "routine medication",
+                "blood-brain barrier"
+            ],
+            [
+                "routine medication",
+                "KLF2 expression"
+            ],
+            [
+                "ZO-1",
+                "blood-brain barrier"
+            ],
+            [
+                "blood-brain barrier",
+                "nerve injury"
+            ],
+            [
+                "NF-\u03baB pathway",
+                "neuroinflammatory response"
+            ],
+            [
+                "KLF2 expression",
+                "neuroinflammatory response"
+            ],
+            [
+                "neuroinflammatory response",
+                "nerve injury"
+            ],
+            [
+                "NF-\u03baB pathway",
+                "nerve injury"
+            ],
+            [
+                "neuroinflammatory response",
+                "delayed cerebral edema"
+            ],
+            [
+                "delayed cerebral edema",
+                "neuroinflammatory response"
+            ],
+            [
+                "KLF2 expression",
+                "delayed cerebral edema"
+            ],
+            [
+                "delayed cerebral edema",
+                "KLF2 expression"
+            ],
+            [
+                "ZO-1",
+                "subdural effusion"
+            ],
+            [
+                "subdural effusion",
+                "ZO-1"
+            ],
+            [
+                "KLF2 expression",
+                "chronic subdural hematoma"
+            ],
+            [
+                "chronic subdural hematoma",
+                "KLF2 expression"
+            ],
+            [
+                "nerve injury",
+                "chronic subdural hematoma"
+            ],
+            [
+                "chronic subdural hematoma",
+                "nerve injury"
+            ],
+            [
+                "neuroinflammatory response",
+                "blood-brain barrier"
+            ],
+            [
+                "blood-brain barrier",
+                "neuroinflammatory response"
+            ],
+            [
+                "NF-\u03baB pathway",
+                "blood-brain barrier"
+            ],
+            [
+                "blood-brain barrier",
+                "NF-\u03baB pathway"
+            ],
+            [
+                "KLF2 expression",
+                "blood-brain barrier"
+            ],
+            [
+                "blood-brain barrier",
+                "KLF2 expression"
+            ],
+            [
+                "neuroinflammatory response",
+                "ZO-1"
+            ],
+            [
+                "ZO-1",
+                "neuroinflammatory response"
+            ],
+            [
+                "NF-\u03baB pathway",
+                "ZO-1"
+            ],
+            [
+                "ZO-1",
+                "NF-\u03baB pathway"
+            ],
+            [
+                "KLF2 expression",
+                "ZO-1"
+            ],
+            [
+                "ZO-1",
+                "KLF2 expression"
+            ]
+        ]
+    ],
+    "cycles": [
+        [
+            [
+                "dexamethasone",
+                "NF-\u03baB pathway",
+                "delayed cerebral edema"
+            ]
+        ]
+    ]
+}
