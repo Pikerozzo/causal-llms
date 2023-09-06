@@ -635,4 +635,4 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_text_in_causal_
 def example_test(directory='../results/'):
     text = 'Excessive alcohol consumption can cause liver cirrhosis, and both can lead to death.'
     text_title = 'Example test'
-    return causal_discovery_pipeline(text_title, text, use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, optimize_found_entities=False, use_text_in_entity_optimization=False, search_cycles=True, plot_static_graph=False, graph_directory_name=directory, verbose=False)
+    return causal_discovery_pipeline(text_title, text, use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, optimize_found_entities=False, use_text_in_entity_optimization=False, search_cycles=False, plot_static_graph=False, graph_directory_name=directory, verbose=False)
