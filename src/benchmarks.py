@@ -54,7 +54,7 @@ def benchmark_evaluation(benchmark_title, ground_truth_nodes, ground_truth_edges
         for i, node1 in enumerate(ground_truth_nodes):
                 for j, node2 in enumerate(ground_truth_nodes):
                     if i > j:
-                        random_edge  = random.randint(0, 4)
+                        random_edge  = random.randint(0, 3)
                         if random_edge  == 0:
                             prediction_edges.append((node1, node2))
                         elif random_edge  == 1:
