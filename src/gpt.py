@@ -27,7 +27,7 @@ import json
 
 import networkx as nx
 from pyvis.network import Network
-import graph_tool.all as gt
+# import graph_tool.all as gt
 
 from cdt.metrics import SHD, precision_recall
 
@@ -77,17 +77,29 @@ def gpt_ner(text):
     and identify all the meaningful entities that could contribute to understanding cause-and-effect relationships 
     between factors such as diseases, medications, treatments, interventions, symptoms, outcomes, effects, or risk factors. 
 
+    Text:
+    <Text>{text}</Text>
+    
     Avoid including entities that are synonyms or can be used interchangeably to already identified ones. For example, if text contains 
     both "hospital" and "medical center" (which are synonyms and can be used interchangeably) and you already extracted "hospital" as final entity, 
     do not include "medical center" as well.
     
     Your response should highlight entities that are crucial for establishing causal relationships in the medical context.
 
-    Answer listing only the found entities within the tags <Answer><Entity>[entity1]</Entity><Entity>[entity2]</Entity></Answer> 
-    (e.g., <Answer><Entity>diabetes</Entity><Entity>hypertension</Entity></Answer>).)
-    
+    Answer listing the found entities within the tags <Answer><Entity>[entity1]</Entity><Entity>[entity2]</Entity></Answer>
+    (e.g., <Answer><Entity>diabetes</Entity><Entity>hypertension</Entity></Answer>) and with the original text in which you highlight
+    the found entities using the "<mark></mark>" HTML tag.
+    Follow this example to understand the expected output:
+
+    Example:
     Text:
-    <Text>{text}</Text>
+    <Text>Smoking increases the risk of respiratory disease, and both can cause lung cancer.</Text>
+
+    Extracted entities: 
+    <Answer><Entity>Smoking</Entity><Entity>respiratory disease</Entity><Entity>lung cancer</Entity></Answer>
+
+    Highlighted text:
+    <HighlightedText><mark>Smoking</mark> increases the risk of <mark>respiratory disease</mark>, and both can cause <mark>lung cancer</mark>.</HighlightedText>
     '''
     
     response = gpt_request(system_msg, user_msg)
@@ -98,8 +110,11 @@ def gpt_ner(text):
     
     soup = BeautifulSoup(answer_text, 'html.parser')
     entities = [entity.text for entity in soup.find_all('entity')]
-    
-    return entities
+
+    text_with_no_tags = soup.find('highlightedtext')
+    highlighted_text = ''.join(str(tag) for tag in text_with_no_tags.contents)
+
+    return entities, highlighted_text
 
 
 def pick_random_causal_verb():
@@ -107,7 +122,7 @@ def pick_random_causal_verb():
     return random.choice(verbs)
 
 
-def gpt_causal_discovery(entities, text=None, use_pretrained_knowledge=False, reverse_variable_check=False):
+def gpt_causal_discovery(entities, text=None, use_pretrained_knowledge=False, reverse_variable_check=False, query_for_bidirected_edges=True):
 
     graph_edges = []    
 
@@ -125,7 +140,7 @@ as medications, treatments, symptoms, diseases, outcomes, side effects, or other
 Examine the roles, interactions, and details surrounding the entities {"within the abstract" if text else ""}.
 Based {"only " if text and not use_pretrained_knowledge else ""}on {"the information in the text " if text else ""}{"and " if text and use_pretrained_knowledge else ""}\
 {"your pretrained knowledge" if use_pretrained_knowledge or not text else ""}, determine the most likely cause-and-effect \
-relationship between the entities from the following listed options (A, B, C, D):\
+relationship between the entities from the following listed options (A, B, C{", D" if query_for_bidirected_edges else ""}):\
     '''
     option_choice_msg = f'''
 Your response should accurately reflect the likely causal connection between the two entities based on the 
@@ -153,8 +168,8 @@ Then provide your final answer within the tags <Answer>[answer]</Answer>, (e.g. 
             Options:
             A: "{e1}" {pick_random_causal_verb()} "{e2}"; 
             B: "{e2}" {pick_random_causal_verb()} "{e1}"; 
-            C: "{e1}" and "{e2}" are not directly causally related; 
-            D: there is a common factor that is the cause for both "{e1}" and "{e2}";\
+            C: "{e1}" and "{e2}" are not directly causally related; \
+            {f"""D: there is a common factor that is the cause for both "{e1}" and "{e2}";""" if query_for_bidirected_edges else ""}
             '''
 
             user_msg = f'''\
@@ -170,6 +185,7 @@ Then provide your final answer within the tags <Answer>[answer]</Answer>, (e.g. 
             {option_choice_msg}
             '''
 
+            print(user_msg)
             response = gpt_request(system_msg, user_msg)
             if response:
                 graph_edges.append(((e1, e2), response))
@@ -190,7 +206,8 @@ no_arrow_answer = 'C'
 bidirectional_arrow = '<->'
 bidirectional_arrow_answer = 'D'
 
-arrows = {forward_arrow_answer:forward_arrow, backward_arrow_answer:backward_arrow, no_arrow_answer:no_arrow, bidirectional_arrow_answer:bidirectional_arrow}
+# arrows = {forward_arrow_answer:forward_arrow, backward_arrow_answer:backward_arrow, no_arrow_answer:no_arrow, bidirectional_arrow_answer:bidirectional_arrow}
+arrows = {forward_arrow_answer:forward_arrow, backward_arrow_answer:backward_arrow, no_arrow_answer:no_arrow}
 
 answer_pattern = re.compile(r'^([A-Z])[.:]')
 
@@ -540,7 +557,7 @@ def build_graph(nodes, edges=[], bidirected_edges=[], cycles=[], plot_static_gra
     net.save_graph(f'{directory_name}/{graph_name}.html')
 
 
-def causal_discovery_pipeline(text_title, text, entities=[], use_text_in_causal_discovery=False, use_LLM_pretrained_knowledge_in_causal_discovery=False, reverse_edge_for_variable_check=False, optimize_found_entities=True, use_text_in_entity_optimization=True, search_cycles=True, plot_static_graph=True, graph_directory_name='../graphs', verbose=False):
+def causal_discovery_pipeline(text_title, text, entities=[], use_text_in_causal_discovery=False, use_LLM_pretrained_knowledge_in_causal_discovery=False, causal_discovery_query_for_bidirected_edges=True, reverse_edge_for_variable_check=False, optimize_found_entities=True, use_text_in_entity_optimization=True, search_cycles=True, plot_static_graph=True, graph_directory_name='../graphs', verbose=False):
     start = time.time()    
     
     if verbose and text:
@@ -568,7 +585,8 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_text_in_causal_
             print(f'Optimized Entities: ({len(entities)} = {entities})')
         
 
-    graph_edges = gpt_causal_discovery(entities, text=(text if use_text_in_causal_discovery else None), use_pretrained_knowledge=use_LLM_pretrained_knowledge_in_causal_discovery, reverse_variable_check=reverse_edge_for_variable_check)
+    # graph_edges = []
+    graph_edges = gpt_causal_discovery(entities, text=(text if use_text_in_causal_discovery else None), use_pretrained_knowledge=use_LLM_pretrained_knowledge_in_causal_discovery, reverse_variable_check=reverse_edge_for_variable_check, query_for_bidirected_edges=causal_discovery_query_for_bidirected_edges)
 
     edges = extract_edge_answers(graph_edges)
     if verbose:
@@ -611,8 +629,8 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_text_in_causal_
         print('--')
 
     cycles = []
-    if search_cycles:
-        cycles = find_cycles(nodes=nodes, edges=directed_edges)
+    # if search_cycles:
+    #     cycles = find_cycles(nodes=nodes, edges=directed_edges)
     build_graph(nodes=nodes, edges=directed_edges, bidirected_edges=bidirected_edges, cycles=cycles, plot_static_graph=plot_static_graph, directory_name=graph_directory_name, graph_name=text_title)
     
     if verbose:
@@ -636,3 +654,9 @@ def example_test(directory='../results/'):
     text = 'Excessive alcohol consumption can cause liver cirrhosis, and both can lead to death.'
     text_title = 'Example test'
     return causal_discovery_pipeline(text_title, text, use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, optimize_found_entities=False, use_text_in_entity_optimization=False, search_cycles=False, plot_static_graph=False, graph_directory_name=directory, verbose=False)
+
+
+    # TODO: 
+    # 1. append highlighted text to the graph html file 
+    # 2. add step after causal discovery that asks what part of text made the LLM choose the answer
+    # 3. add explanaition as edge label in the graph
