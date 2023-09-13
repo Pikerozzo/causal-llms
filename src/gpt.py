@@ -49,9 +49,30 @@ model_ids = [model['id'] for model in models['data']]
 
 gpt_4 = 'gpt-4'
 default_model = 'gpt-3.5-turbo'
-use_gpt_4 = True
-if use_gpt_4 and gpt_4 in model_ids:
-    default_model = gpt_4
+
+
+forward_arrow = '->'
+forward_arrow_answer = 'A'
+backward_arrow = '<-'
+backward_arrow_answer = 'B'
+no_arrow = ' '
+no_arrow_answer = 'C'
+bidirectional_arrow = '<->'
+bidirectional_arrow_answer = 'D'
+arrows = {forward_arrow_answer:forward_arrow, backward_arrow_answer:backward_arrow, no_arrow_answer:no_arrow}
+coherent_answers = [(forward_arrow, backward_arrow), (backward_arrow, forward_arrow), (no_arrow, no_arrow)]
+
+answer_pattern = re.compile(r'^([A-Z])[.:]')
+
+def init(use_gpt_4=True, query_for_bidirected_edges=True):
+
+    if use_gpt_4 and gpt_4 in model_ids:
+        global default_model
+        default_model = gpt_4
+
+    if query_for_bidirected_edges:
+        arrows[bidirectional_arrow_answer] = bidirectional_arrow
+        coherent_answers.append((bidirectional_arrow, bidirectional_arrow))
 
 
 def gpt_request(system_msg, user_msg, model=default_model, temperature=0.2):
@@ -168,7 +189,7 @@ Then provide your final answer within the tags <Answer>[answer]</Answer>, (e.g. 
             Options:
             A: "{e1}" {pick_random_causal_verb()} "{e2}"; 
             B: "{e2}" {pick_random_causal_verb()} "{e1}"; 
-            C: "{e1}" and "{e2}" are not directly causally related; \
+            C: "{e1}" and "{e2}" are not directly causally related;
             {f"""D: there is a common factor that is the cause for both "{e1}" and "{e2}";""" if query_for_bidirected_edges else ""}
             '''
 
@@ -185,7 +206,6 @@ Then provide your final answer within the tags <Answer>[answer]</Answer>, (e.g. 
             {option_choice_msg}
             '''
 
-            print(user_msg)
             response = gpt_request(system_msg, user_msg)
             if response:
                 graph_edges.append(((e1, e2), response))
@@ -196,20 +216,6 @@ Then provide your final answer within the tags <Answer>[answer]</Answer>, (e.g. 
     
     return graph_edges
 
-
-forward_arrow = '->'
-forward_arrow_answer = 'A'
-backward_arrow = '<-'
-backward_arrow_answer = 'B'
-no_arrow = ' '
-no_arrow_answer = 'C'
-bidirectional_arrow = '<->'
-bidirectional_arrow_answer = 'D'
-
-# arrows = {forward_arrow_answer:forward_arrow, backward_arrow_answer:backward_arrow, no_arrow_answer:no_arrow, bidirectional_arrow_answer:bidirectional_arrow}
-arrows = {forward_arrow_answer:forward_arrow, backward_arrow_answer:backward_arrow, no_arrow_answer:no_arrow}
-
-answer_pattern = re.compile(r'^([A-Z])[.:]')
 
 def get_edge_answer(text):
     soup = BeautifulSoup(text, 'html.parser')
@@ -336,7 +342,6 @@ def extract_edge_answers(edges):
 
     return edges_with_answers
 
-coherent_answers = [(forward_arrow, backward_arrow), (backward_arrow, forward_arrow), (no_arrow, no_arrow), (bidirectional_arrow, bidirectional_arrow)]
 def check_edge_compatibility(answer1, answer2):
     return (arrows[answer1], arrows[answer2]) in coherent_answers
 
@@ -385,7 +390,7 @@ def get_textual_answers(e1, e2, ans):
         return None
 
 
-def correct_invalid_edges(invalid_edges, text=None, use_pretrained_knowledge=False):
+def correct_invalid_edges(invalid_edges, text=None, use_pretrained_knowledge=False, query_for_bidirected_edges=True):
     graph_edges = []
 
     if not invalid_edges:
@@ -436,7 +441,8 @@ Then provide your final answer within the tags <Answer>[answer]</Answer>, (e.g. 
         A: "{e1}" {pick_random_causal_verb()} "{e2}"; 
         B: "{e2}" {pick_random_causal_verb()} "{e1}"; 
         C: "{e1}" and "{e2}" are not directly causally related; 
-        D: there is a common factor that is the cause for both "{e1}" and "{e2}";'''
+        {f"""D: there is a common factor that is the cause for both "{e1}" and "{e2}";""" if query_for_bidirected_edges else ""}
+        '''
 
         user_msg = f'''\
         {intro_msg}
@@ -461,6 +467,80 @@ Then provide your final answer within the tags <Answer>[answer]</Answer>, (e.g. 
     return graph_edges
 
 
+def gpt_edge_explanation(edges, text=None):
+    graph_edges = []
+    
+    system_msg = 'You are a helpful assistant for causal reasoning and cause-and-effect relationship discovery.'
+ 
+    intro_msg = f'''
+You will be provided with {"a text of a medical research paper delimited by the <Text></Text> xml tags, " if text else ""}\
+a pair of entities delimited by the <Entity></Entity> xml tags representing medical entities {"extracted from the given text" if text else ""} (such
+as medications, treatments, symptoms, diseases, outcomes, side effects, or other medical factors), and the causal relationship found between the two entities\
+delimited by the <Relationship></Relationship> xml tags, that has been previously extracted {"from the given medical text" if text else ""}.
+
+    {f"""
+    Text:
+    <Text>{text}</Text>""" if text else ""}
+    '''
+    instructions_msg = f'''
+Your first task is to read carefully the provided text and the causal relationship found between the two entities.
+Then, given the causal relationship {"and the provided text" if text else ""}, you should {"extract the piece of text or sentence that explains" if text else "provide a textual explanation of"} 
+the causal relationship between the two entities, representing the reason why that particular causal relationship was previously chosen.
+{"Make sure that the explanation of the causal relationship is actually extracted from the given text. Once you have an answer, check that is it extracted from the given text." if text else ""}
+
+Provide your final answer within the tags <Answer>[answer]</Answer>, (e.g. <Answer>Smoking increases the risk of respiratory disease</Answer>).
+If the two entities are not causally related, simply provide an empty answer within the tags <Answer></Answer>.
+
+Follow the example below to better understand the task and the expected output.
+
+EXAMPLE:
+
+Text:
+<Text>Smoking increases the risk of respiratory disease, and both can cause lung cancer.</Text>
+
+Entities:
+<Entity>smoking</Entity>
+<Entity>respiratory disease</Entity>
+
+Relationship:
+<Relationship>"smoking" causes "respiratory disease"</Relationship>
+
+You should extract the piece of text that explains the causal relationship between the two entities, which in this case is:
+<Answer>Smoking increases the risk of respiratory disease</Answer>
+    '''
+
+    for (e1, e2), answer in edges:
+        textual_relationship = get_textual_answers(e1, e2, answer)
+
+        user_msg = f'''\
+        {intro_msg}
+
+        Entities:
+        <Entity>{e1}</Entity>
+        <Entity>{e2}</Entity>
+
+        Relationship:
+        <Relationship>{textual_relationship}</Relationship>
+
+        {instructions_msg}
+        '''
+
+        response = gpt_request(system_msg, user_msg)
+
+        if response:
+            soup = BeautifulSoup(response, 'html.parser')
+            gpt_explanation = soup.find('answer').text
+            try:
+                print((((e1, e2), answer), gpt_explanation))
+                graph_edges.append((((e1, e2), answer), gpt_explanation))
+            except (json.JSONDecodeError, TypeError):
+                pass
+
+    return graph_edges
+
+
+
+
 def normalize_edge_direction(e1, e2, answer):
     if answer in arrows:
         if arrows[answer] == forward_arrow:
@@ -472,26 +552,52 @@ def normalize_edge_direction(e1, e2, answer):
     return None
 
 
-def preprocess_edges(edges):
+def preprocess_edges(edges, perform_edge_explanation=False):
     nodes = set()
     directed_edges = []
     bidirected_edges = []
 
-    for (n1, n2), answer in edges:
+    for edge in edges:
+    # for (n1, n2), answer in edges:
+        if perform_edge_explanation:
+            ((n1, n2), answer), explanation = edge
+        else:
+            (n1, n2), answer = edge
+
         nodes.add(n1)
         nodes.add(n2)
-            
+
         direction = normalize_edge_direction(n1, n2, answer)
         if direction:
-            if len(direction) == 2:
+            is_bidirectional = len(direction) == 2
+
+            # for bidirectional edges,
+            #    if explanation 
+            #           use (((n1,n2),(n2,n1)), 'text explanation')
+            #    else 
+            #           append (.extend()) array [(n1,n2),(n2,n1)], 
+            if is_bidirectional:
+                direction = [((direction[0],direction[1]), explanation)] if perform_edge_explanation else direction
                 bidirected_edges.extend(direction)
+
+                # if perform_edge_explanation:
+                #     direction = ((direction[0],direction[1]), explanation)
+                #     bidirected_edges.append(direction)
+                # else:
+                #     bidirected_edges.extend(direction)
             else:
+                direction = [(direction[0], explanation)] if perform_edge_explanation else direction
                 directed_edges.extend(direction)
+            
+            # if is_bidirectional:
+            #     bidirected_edges.append(direction)
+            # else:
+            #     directed_edges.append(direction)
 
     return list(nodes), directed_edges, bidirected_edges
 
 
-def find_cycles(nodes=[], edges=[], return_first_100_cycles=True):
+def find_cycles(nodes=[], edges=[], return_first_100_cycles=True, edge_explanation=False):
     if not nodes or not edges:
         return []
 
@@ -504,7 +610,8 @@ def find_cycles(nodes=[], edges=[], return_first_100_cycles=True):
         v_prop[v] = n
         nodes_ids[n] = v
 
-    for (n1, n2) in edges:
+    for edge in edges:
+        (n1, n2), _ = edge if edge_explanation else edge, _
         e = g.add_edge(nodes_ids[n1], nodes_ids[n2])
 
     cycles = []
@@ -516,7 +623,7 @@ def find_cycles(nodes=[], edges=[], return_first_100_cycles=True):
     return cycles
 
 
-def build_graph(nodes, edges=[], bidirected_edges=[], cycles=[], plot_static_graph=True, directory_name='../graphs', graph_name='mygraph'):
+def build_graph(nodes, edges=[], bidirected_edges=[], cycles=[], plot_static_graph=True, directory_name='../graphs', graph_name='mygraph', highlighted_text=None, edge_explanation=False):
 
     if plot_static_graph:
         plt.figure()
@@ -524,16 +631,32 @@ def build_graph(nodes, edges=[], bidirected_edges=[], cycles=[], plot_static_gra
 
     G.add_nodes_from(nodes)
 
-    for e1, e2 in edges:
-        G.add_edge(e1, e2, color='black', style='solid')
+    # for e1, e2 in edges:
+    for edge in edges:
+        print(f'\n---\n{edge}')
+        if edge_explanation:
+            (e1, e2), explanation = edge
+            G.add_edge(e1, e2, title=explanation, color='black', style='solid')
+        else:
+            e1, e2 = edge
+            G.add_edge(e1, e2, color='black', style='solid')
 
     for cycle in cycles:
         for i in range(len(cycle) - 1):
             G[cycle[i]][cycle[i + 1]]['color'] = 'red'
         G[cycle[-1]][cycle[0]]['color'] = 'red'
 
-    for e1, e2 in bidirected_edges:
-        G.add_edge(e1, e2, color='grey', style='dashed')
+    for edge in bidirected_edges:
+    # for e1, e2 in bidirected_edges:
+        print(f'\n---\n{edge}')
+        if edge_explanation:
+            ((e1, e2), _), explanation = edge
+            G.add_edge(e1, e2, title=explanation, color='grey', style='dashed')
+            G.add_edge(e2, e1, color='grey', style='dashed')
+        else:
+            e1, e2 = edge
+            G.add_edge(e1, e2, color='grey', style='dashed')
+        # G.add_edge(e1, e2, color='grey', style='dashed')
 
     if plot_static_graph:
         pos = nx.spring_layout(G)
@@ -549,24 +672,49 @@ def build_graph(nodes, edges=[], bidirected_edges=[], cycles=[], plot_static_gra
         plt.title(graph_name)
         plt.show()
 
+    graph_file_name = f'{directory_name}/{graph_name}.html'
     net = Network(directed=True)
     net.from_nx(G)
     net.force_atlas_2based()
     net.show_buttons(filter_=['physics'])
     os.makedirs(directory_name, exist_ok=True)
-    net.save_graph(f'{directory_name}/{graph_name}.html')
+    net.save_graph(graph_file_name)
+
+    if highlighted_text:
+        with open(graph_file_name, 'r', encoding='utf-8') as file:
+            graph_html = file.read()
+
+        graph_soup = BeautifulSoup(graph_html, 'html.parser')
+
+        new_paragraph = graph_soup.new_tag('p')
+        new_paragraph.append(BeautifulSoup(highlighted_text, 'html.parser'))
+
+        new_section = graph_soup.new_tag('section')
+        new_section.append(new_paragraph)
+
+        body = graph_soup.find('body')
+
+        if body:
+            body.insert(0, new_section)
+
+        with open(graph_file_name, 'w', encoding='utf-8') as file:
+            file.write(graph_soup.prettify())
 
 
-def causal_discovery_pipeline(text_title, text, entities=[], use_text_in_causal_discovery=False, use_LLM_pretrained_knowledge_in_causal_discovery=False, causal_discovery_query_for_bidirected_edges=True, reverse_edge_for_variable_check=False, optimize_found_entities=True, use_text_in_entity_optimization=True, search_cycles=True, plot_static_graph=True, graph_directory_name='../graphs', verbose=False):
-    start = time.time()    
-    
+
+def causal_discovery_pipeline(text_title, text, entities=[], use_gpt_4=True, use_text_in_causal_discovery=False, use_LLM_pretrained_knowledge_in_causal_discovery=False, causal_discovery_query_for_bidirected_edges=True, perform_edge_explanation=False, reverse_edge_for_variable_check=False, optimize_found_entities=True, use_text_in_entity_optimization=True, search_cycles=True, plot_static_graph=True, graph_directory_name='../graphs', verbose=False):
+    start = time.time()
+
+    init(use_gpt_4, causal_discovery_query_for_bidirected_edges)
+
     if verbose and text:
         print('Text:')
         print(text)
         print('--')
 
+    text_with_highlighted_variables = None
     if entities == []:
-        entities = gpt_ner(text)
+        entities, text_with_highlighted_variables = gpt_ner(text)
     else:
         if verbose:
             print('Skipping NER operation. Using provided entities.')
@@ -585,8 +733,10 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_text_in_causal_
             print(f'Optimized Entities: ({len(entities)} = {entities})')
         
 
-    # graph_edges = []
-    graph_edges = gpt_causal_discovery(entities, text=(text if use_text_in_causal_discovery else None), use_pretrained_knowledge=use_LLM_pretrained_knowledge_in_causal_discovery, reverse_variable_check=reverse_edge_for_variable_check, query_for_bidirected_edges=causal_discovery_query_for_bidirected_edges)
+    # graph_edges = gpt_causal_discovery(entities, text=(text if use_text_in_causal_discovery else None), use_pretrained_knowledge=use_LLM_pretrained_knowledge_in_causal_discovery, reverse_variable_check=reverse_edge_for_variable_check, query_for_bidirected_edges=causal_discovery_query_for_bidirected_edges)
+    graph_edges = [(('Excessive alcohol consumption', 'liver cirrhosis'), '<Answer>A</Answer>'), (('Excessive alcohol consumption', 'death'), '<Answer>A</Answer>'), (('liver cirrhosis', 'death'), '<Answer>A</Answer>'), (('unhealthy diet', 'weight increase'), '<Answer>A</Answer>'), (('weight increase', 'death'), '<Answer>C</Answer>'), (('weight increase', 'Excessive alcohol consumption'), '<Answer>C</Answer>'), (('weight increase', 'liver cirrhosis'), '<Answer>C</Answer>'), (('unhealthy diet', 'liver cirrhosis'), '<Answer>C</Answer>'), (('unhealthy diet', 'Excessive alcohol consumption'), '<Answer>C</Answer>'), (('unhealthy diet', 'death'), '<Answer>C</Answer>')]
+    # graph_edges = [(('CANCER', 'TUMOR'), '<Answer>D</Answer>'), (('SMOKING', 'FUMES'), '<Answer>A</Answer>')]
+    # graph_edges = [(('SMOKING', 'FUMES'), '<Answer>D</Answer>')]
 
     edges = extract_edge_answers(graph_edges)
     if verbose:
@@ -604,7 +754,7 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_text_in_causal_
             print(invalid_edges)
             print('--')
         
-        edge_correction_response = correct_invalid_edges(invalid_edges, text, use_pretrained_knowledge=use_LLM_pretrained_knowledge_in_causal_discovery)
+        edge_correction_response = correct_invalid_edges(invalid_edges, text, use_pretrained_knowledge=use_LLM_pretrained_knowledge_in_causal_discovery, query_for_bidirected_edges=causal_discovery_query_for_bidirected_edges)
         corrected_edges = extract_edge_answers(edge_correction_response)
         if verbose:
             print('Edge Correction Response:')
@@ -614,7 +764,10 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_text_in_causal_
         valid_edges.extend(corrected_edges)
         edges = valid_edges
     
-    nodes, directed_edges, bidirected_edges = preprocess_edges(edges)
+    if perform_edge_explanation:
+        edges = gpt_edge_explanation(edges, text=(text if use_text_in_causal_discovery else None))
+
+    nodes, directed_edges, bidirected_edges = preprocess_edges(edges, perform_edge_explanation)
 
     graph_data = {'nodes': [nodes], 'edges': [directed_edges + bidirected_edges], 'cycles': []}
     with open(f'{graph_directory_name}/{text_title}.json', "w") as json_file:
@@ -631,7 +784,8 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_text_in_causal_
     cycles = []
     # if search_cycles:
     #     cycles = find_cycles(nodes=nodes, edges=directed_edges)
-    build_graph(nodes=nodes, edges=directed_edges, bidirected_edges=bidirected_edges, cycles=cycles, plot_static_graph=plot_static_graph, directory_name=graph_directory_name, graph_name=text_title)
+    print(bidirected_edges)
+    build_graph(nodes=nodes, edges=directed_edges, bidirected_edges=bidirected_edges, cycles=cycles, plot_static_graph=plot_static_graph, directory_name=graph_directory_name, graph_name=text_title, highlighted_text=text_with_highlighted_variables, edge_explanation=perform_edge_explanation)
     
     if verbose:
         if cycles:
@@ -652,11 +806,11 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_text_in_causal_
 # Example text for test
 def example_test(directory='../results/'):
     text = 'Excessive alcohol consumption can cause liver cirrhosis, and both can lead to death.'
+    text = 'Excessive alcohol consumption can cause liver cirrhosis, and both can lead to death. An uhealthy diet can result in weight increase.'
     text_title = 'Example test'
-    return causal_discovery_pipeline(text_title, text, use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, optimize_found_entities=False, use_text_in_entity_optimization=False, search_cycles=False, plot_static_graph=False, graph_directory_name=directory, verbose=False)
-
-
-    # TODO: 
-    # 1. append highlighted text to the graph html file 
-    # 2. add step after causal discovery that asks what part of text made the LLM choose the answer
-    # 3. add explanaition as edge label in the graph
+    bidirected_edges=True
+    edge_explanation=True
+    print(f'BI-EDGES     = {bidirected_edges}')
+    print(f'EXPLANATION  = {edge_explanation}')
+    # return causal_discovery_pipeline(text_title, text, use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, causal_discovery_query_for_bidirected_edges=False, perform_edge_explanation=True, optimize_found_entities=False, use_text_in_entity_optimization=False, search_cycles=False, plot_static_graph=False, graph_directory_name=directory, verbose=False)
+    return causal_discovery_pipeline(text_title, text, use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, causal_discovery_query_for_bidirected_edges=bidirected_edges, perform_edge_explanation=edge_explanation, optimize_found_entities=False, use_text_in_entity_optimization=False, search_cycles=False, plot_static_graph=False, graph_directory_name=directory, verbose=False)
