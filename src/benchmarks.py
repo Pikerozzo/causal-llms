@@ -42,7 +42,7 @@ def f1_score(precision, recall):
         return None
 
 
-def benchmark_evaluation(benchmark_title, ground_truth_nodes, ground_truth_edges, SHD_double_for_anticausal=True, save_graphs=True, graphs_directory='../graphs', algorithm=Algorithm.GPT, verbose=False):
+def benchmark_prediction(benchmark_title, ground_truth_nodes, ground_truth_edges, SHD_double_for_anticausal=True, save_graphs=True, graphs_directory='../graphs', algorithm=Algorithm.GPT, verbose=False):
 
     if ground_truth_nodes is None or ground_truth_edges is None:
         print("Ground truth nodes or edges are None.")
@@ -69,6 +69,24 @@ def benchmark_evaluation(benchmark_title, ground_truth_nodes, ground_truth_edges
     if verbose:
         print(prediction_edges)
 
+    # ground_truth_graph = nx.DiGraph()
+    # ground_truth_graph.add_nodes_from(ground_truth_nodes)
+    # ground_truth_graph.add_edges_from(ground_truth_edges)
+
+    # prediction_graph = nx.DiGraph()
+    # prediction_graph.add_nodes_from(ground_truth_nodes)
+    # prediction_graph.add_edges_from(prediction_edges)
+
+    # shd = SHD(ground_truth_graph, prediction_graph, double_for_anticausal=SHD_double_for_anticausal)
+
+    # aupr, curve = precision_recall(ground_truth_graph, prediction_graph)
+
+    # return shd, aupr, curve, prediction_edges, cycles
+
+    return nodes, prediction_edges, cycles
+
+
+def evaluate_predictions(ground_truth_nodes, ground_truth_edges, prediction_edges, SHD_double_for_anticausal=True, verbose=False):
     ground_truth_graph = nx.DiGraph()
     ground_truth_graph.add_nodes_from(ground_truth_nodes)
     ground_truth_graph.add_edges_from(ground_truth_edges)
@@ -81,7 +99,31 @@ def benchmark_evaluation(benchmark_title, ground_truth_nodes, ground_truth_edges
 
     aupr, curve = precision_recall(ground_truth_graph, prediction_graph)
 
-    return shd, aupr, curve, prediction_edges, cycles
+    extra_edges = []
+    missing_edges = []
+    correct_direction = []
+    incorrect_direction = []
+
+    for e in prediction_edges:
+        if e not in ground_truth_edges:
+            extra_edges.append(e)
+        if (e in ground_truth_edges and (e[1], e[0]) not in ground_truth_edges and (e[1], e[0]) not in prediction_edges) or (e in ground_truth_edges and (e[1], e[0]) in ground_truth_edges and (e[1], e[0]) in prediction_edges):
+            correct_direction.append(e)
+        else:
+            incorrect_direction.append(e)
+
+    for e in ground_truth_edges:
+        if e not in prediction_edges:
+            missing_edges.append(e)
+    
+    if len(curve) == 2:
+        precision, recall = curve[0][0], curve[0][1]
+    else:
+        precision, recall = curve[1][0], curve[1][1]
+
+    f1 = f1_score(precision, recall)
+
+    return shd, aupr, curve, precision, recall, f1, prediction_edges, missing_edges, extra_edges, correct_direction, incorrect_direction
 
 
 def precision_recall_curve_plot(titles, curves, graph_path):
@@ -118,7 +160,6 @@ def precision_recall_curve_plot(titles, curves, graph_path):
     )
 
     fig.write_html(f'{graph_path}/precision_recall_curve.html')
-
 
 
 def f1_score_hist(titles, curves, graph_path):
@@ -209,33 +250,16 @@ def run_benchmarks(benchmark_algorithm=Algorithm.GPT):
     data_list = []
 
     for title, ground_truth_nodes, ground_truth_edges in ground_truth_graphs:
-        shd, aupr, curve, prediction_edges, prediction_cycles = benchmark_evaluation(title, ground_truth_nodes, ground_truth_edges, save_graphs=True, graphs_directory=graphs_directory_path, algorithm=benchmark_algorithm, verbose=True)
+        # shd, aupr, curve, prediction_edges, prediction_cycles = benchmark_evaluation(title, ground_truth_nodes, ground_truth_edges, save_graphs=True, graphs_directory=graphs_directory_path, algorithm=benchmark_algorithm, verbose=True)
+        nodes, prediction_edges, prediction_cycles = benchmark_prediction(title, ground_truth_nodes, ground_truth_edges, save_graphs=True, graphs_directory=graphs_directory_path, algorithm=benchmark_algorithm, verbose=True)
+        shd, aupr, curve, precision, recall, f1, prediction_edges, missing_edges, extra_edges, correct_direction, incorrect_direction = evaluate_predictions(ground_truth_nodes, ground_truth_edges, prediction_edges)
+        
         titles.append(title)
         shds.append(shd)
         auprs.append(aupr)
         curves.append(curve)
         pred_edges.append(prediction_edges)
         pred_cycles.append(prediction_cycles)
-
-        extra_edges = []
-        missing_edges = []
-        correct_direction = []
-        incorrect_direction = []
-
-        for e in prediction_edges:
-            if e not in ground_truth_edges:
-                extra_edges.append(e)
-            if (e in ground_truth_edges and (e[1], e[0]) not in ground_truth_edges and (e[1], e[0]) not in prediction_edges) or (e in ground_truth_edges and (e[1], e[0]) in ground_truth_edges and (e[1], e[0]) in prediction_edges):
-                correct_direction.append(e)
-            else:
-                incorrect_direction.append(e)
-
-        for e in ground_truth_edges:
-            if e not in prediction_edges:
-                missing_edges.append(e)
-        
-        precision, recall = curve[1][0], curve[1][1]
-        f1 = f1_score(precision, recall)
 
         print(f'{title} completed:')
         print(f'    SHD                 = {shd}')

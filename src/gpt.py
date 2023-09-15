@@ -49,6 +49,9 @@ model_ids = [model['id'] for model in models['data']]
 
 gpt_4 = 'gpt-4'
 default_model = 'gpt-3.5-turbo'
+use_gpt_4=True
+if use_gpt_4 and gpt_4 in model_ids:
+    default_model = gpt_4
 
 
 forward_arrow = '->'
@@ -66,9 +69,9 @@ answer_pattern = re.compile(r'^([A-Z])[.:]')
 
 def init(use_gpt_4=True, query_for_bidirected_edges=True):
 
-    if use_gpt_4 and gpt_4 in model_ids:
-        global default_model
-        default_model = gpt_4
+    # if use_gpt_4 and gpt_4 in model_ids:
+    #     global default_model
+    #     default_model = gpt_4
 
     if query_for_bidirected_edges:
         arrows[bidirectional_arrow_answer] = bidirectional_arrow
@@ -243,7 +246,7 @@ def print_edges(graph_edges):
 
 
 def optimize_entities(entities, text=None):
-    system_msg = 'You are a helpful assistant for medical entity optimization, by accurately identifying synonyms, redundant entities, or entities that can be used interchangeably'
+    system_msg = 'You are a helpful assistant for medical entity optimization, by accurately identifying and pairing synonyms, redundant entities, or entities that can be used interchangeably'
 
     entities_text = '\n'.join([f'<Entity>{entity}</Entity>' for entity in entities])
 
@@ -257,18 +260,18 @@ a list of named entities representing medical entities, each one of them delimit
 Entities:
 {entities_text}
 
-Your task is to optimize this entity list by identifying synonyms within the entities and grouping them accordingly. 
-Your goal is to create a JSON object where the keys represent the root word entities, and each key is associated with 
-an array of its synonyms, i.e., words or entities that can be used interchangeably to the root word.
+Your task is to optimize this entity list by identifying synonyms within the entities and grouping them accordingly. \
+Your goal is to create a JSON object where the keys represent the root word entities, and each key is associated with \
+an array of its synonyms, i.e., words or entities that can be used interchangeably to the root word.\
 If a root word entity has no synonyms, its value in the JSON should be an empty array.
 
-Ensure that each entity appears only once in the dictionary, either as key (i.e. root word) or as element in the value arrays (i.e. the synonyms):
-an entity must must not appear as key if it is the synonym (i.e. in the value array) of another entity, and the other way around (i.e. must not be 
+Ensure that each entity appears only once in the dictionary, either as key (i.e. root word) or as element in the value arrays (i.e. the synonyms): \
+an entity must must not appear as key if it is the synonym (i.e. in the value array) of another entity, and the other way around (i.e. must not be \
 in the value array of an entity if it is already a key of the JSON object).
 An entity must not be a synonym of itself.
 
 You should efficiently process the given list of entities and produce the desired dictionary structure.
-The output JSON object should accurately represent the optimized entities and their synonyms based on the provided list.
+The output JSON object should accurately represent the optimized entities and their synonyms based on the provided list.\
 
 Then provide your final JSON object answer within the tags <Answer>[json_object]</Answer>, (e.g. <Answer>{{
     "smoking": ["tobacco", "nicotine", "cigarettes", "cigar"],
@@ -276,7 +279,15 @@ Then provide your final JSON object answer within the tags <Answer>[json_object]
     "tumors": []
 }}</Answer>).
 
-Follow the example below to understand the expected output.
+You can follow these steps to complete the task:
+1. Read carefully the provided list of entities.
+2. Loop through the list of entities and identify synonyms. For each entity, find if there are any other entities that are synonyms of it.
+3. If the entity has synonyms, check if any of these are already present in the JSON object as key elements: if it is the case, add this entity \
+    as an element of the value array of the key entity. If not, add the entity as a key element and add its synonyms as elements of its value array.
+4. If the entity has no synonyms, check if it is already present in the JSON object as key element: if it is the case, do nothing. If not, add \
+    the entity as a key element and add an empty array as its value.
+
+Follow the examples below to understand the expected output.
 
 Example:
 
@@ -301,14 +312,133 @@ You should pair the synonyms, generate the following JSON object and provide it 
 
 Note that every entity appears only once in the output JSON object, either as key or as element in the value arrays.
 
-After you have finished building the JSON object, check and make sure that every entity appears only once in the output JSON object, either as key or as element in the value arrays.
+After you have finished building the JSON object, check and make sure that every entity appears only once in the output JSON object, \
+either as key or as element in the value arrays.
+
+After you have finished building the JSON object, perform an 
+
+If you realize you have made a mistake by adding entities twice in the JSON object, you must go back and correct it.
+For example, if you have added "lung cancer" as a synonym of "cancer" and "lung cancer" also appears as a key element, you should remove 
+the redundant "lung cancer" element from the JSON object keys, while keeping it in the synonyms array of "cancer".
+
+Follow the example below to understand how you should behave in case you realize an entity appears multiple times, as both key element and synonym in the value arrays.
+
+Example:
+If you create an output JSON object that looks like this:
+<Answer>
+{{
+    "smoking": ["tobacco", "nicotine", "cigarettes", "cigar"],
+    "cancer": ["lung cancer"],
+    "lung cancer": ["cancer"],
+    "tumors": []
+}}
+</Answer>
+
+You should perform a careful check and realize that "lung cancer" appears both as key element and in the value arrays, as synonym of the "cancer" entity. \
+You should remove the redundant "lung cancer" element from the JSON object keys, while keeping it in the synonyms array of "cancer", and provide the following JSON 
+object as your answer:
+<Answer>
+{{
+    "smoking": ["tobacco", "nicotine", "cigarettes", "cigar"],
+    "cancer": ["lung cancer"],
+    "tumors": []
+}}
+</Answer>
 '''
+#     user_msg = f'''
+# You will be provided with {'an abstract of a medical research paper delimited by the <Text></Text> xml tags, and ' if text else ''} \
+# a list of named entities representing medical entities, each one of them delimited by the <Entity></Entity> xml tags. \
+
+# {f"""Text:
+# <Text>{text}</Text>""" if text else ""}
+
+# Entities:
+# {entities_text}
+
+# Your task is to optimize this entity list by identifying synonyms within the entities and grouping them accordingly. \
+# Your goal is to create a JSON object where the keys represent the root word entities, and each key is associated with \
+# an array of its synonyms, i.e., words or entities that can be used interchangeably to the root word.\
+# If a root word entity has no synonyms, its value in the JSON should be an empty array.
+
+# Ensure that each entity appears only once in the dictionary, either as key (i.e. root word) or as element in the value arrays (i.e. the synonyms): \
+# an entity must must not appear as key if it is the synonym (i.e. in the value array) of another entity, and the other way around (i.e. must not be \
+# in the value array of an entity if it is already a key of the JSON object).
+# An entity must not be a synonym of itself.
+
+# You should efficiently process the given list of entities and produce the desired dictionary structure.
+# The output JSON object should accurately represent the optimized entities and their synonyms based on the provided list.\
+
+# Then provide your final JSON object answer within the tags <Answer>[json_object]</Answer>, (e.g. <Answer>{{
+#     "smoking": ["tobacco", "nicotine", "cigarettes", "cigar"],
+#     "cancer": ["lung cancer"],
+#     "tumors": []
+# }}</Answer>).
+
+# Follow the example below to understand the expected output.
+
+# Example:
+
+# Given the initial list of entities:
+# <Entity>smoking</Entity>
+# <Entity>lung cancer</Entity>
+# <Entity>tumors</Entity>
+# <Entity>cancer</Entity>
+# <Entity>tobacco</Entity>
+# <Entity>nicotine</Entity>
+# <Entity>cigarettes</Entity>
+# <Entity>cigar</Entity>
+
+# You should pair the synonyms, generate the following JSON object and provide it as your answer:
+# <Answer>
+# {{
+#     "smoking": ["tobacco", "nicotine", "cigarettes", "cigar"],
+#     "cancer": ["lung cancer"],
+#     "tumors": []
+# }}
+# </Answer>
+
+# Note that every entity appears only once in the output JSON object, either as key or as element in the value arrays.
+
+# After you have finished building the JSON object, check and make sure that every entity appears only once in the output JSON object, \
+# either as key or as element in the value arrays.
+
+# After you have finished building the JSON object, perform an 
+
+# If you realize you have made a mistake by adding entities twice in the JSON object, you must go back and correct it.
+# For example, if you have added "lung cancer" as a synonym of "cancer" and "lung cancer" also appears as a key element, you should remove 
+# the redundant "lung cancer" element from the JSON object keys, while keeping it in the synonyms array of "cancer".
+
+# Follow the example below to understand how you should behave in case you realize an entity appears multiple times, as both key element and synonym in the value arrays.
+
+# Example:
+# If you create an output JSON object that looks like this:
+# <Answer>
+# {{
+#     "smoking": ["tobacco", "nicotine", "cigarettes", "cigar"],
+#     "cancer": ["lung cancer"],
+#     "lung cancer": ["cancer"],
+#     "tumors": []
+# }}
+# </Answer>
+
+# You should perform a careful check and realize that "lung cancer" appears both as key element and in the value arrays, as synonym of the "cancer" entity. \
+# You should remove the redundant "lung cancer" element from the JSON object keys, while keeping it in the synonyms array of "cancer", and provide the following JSON 
+# object as your answer:
+# <Answer>
+# {{
+#     "smoking": ["tobacco", "nicotine", "cigarettes", "cigar"],
+#     "cancer": ["lung cancer"],
+#     "tumors": []
+# }}
+# </Answer>
+# '''
     
-    response = gpt_request(system_msg, user_msg)
+    response = gpt_request(system_msg, user_msg, temperature=1)
     if response:
         soup = BeautifulSoup(response, 'html.parser')
         answer = soup.find('answer').text
         try:
+            print(f'\n{answer}\n') # TODO: remove
             opt_entities = json.loads(answer)
             if opt_entities:
                 return opt_entities
@@ -707,6 +837,7 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_gpt_4=True, use
 
     init(use_gpt_4, causal_discovery_query_for_bidirected_edges)
 
+    print(default_model)
     if verbose and text:
         print('Text:')
         print(text)
@@ -720,6 +851,7 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_gpt_4=True, use
             print('Skipping NER operation. Using provided entities.')
             print('--')
 
+    print(f'Entities ({len(entities)}): {entities}') # TODO remove
 
     if verbose:
         print(f'Entities: ({len(entities)} = {entities})')
@@ -732,9 +864,10 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_gpt_4=True, use
         if verbose:
             print(f'Optimized Entities: ({len(entities)} = {entities})')
         
+    print(f'Opt. Entities ({len(entities)}): {entities}') # TODO remove
 
-    # graph_edges = gpt_causal_discovery(entities, text=(text if use_text_in_causal_discovery else None), use_pretrained_knowledge=use_LLM_pretrained_knowledge_in_causal_discovery, reverse_variable_check=reverse_edge_for_variable_check, query_for_bidirected_edges=causal_discovery_query_for_bidirected_edges)
-    graph_edges = [(('Excessive alcohol consumption', 'liver cirrhosis'), '<Answer>A</Answer>'), (('Excessive alcohol consumption', 'death'), '<Answer>A</Answer>'), (('liver cirrhosis', 'death'), '<Answer>A</Answer>'), (('unhealthy diet', 'weight increase'), '<Answer>A</Answer>'), (('weight increase', 'death'), '<Answer>C</Answer>'), (('weight increase', 'Excessive alcohol consumption'), '<Answer>C</Answer>'), (('weight increase', 'liver cirrhosis'), '<Answer>C</Answer>'), (('unhealthy diet', 'liver cirrhosis'), '<Answer>C</Answer>'), (('unhealthy diet', 'Excessive alcohol consumption'), '<Answer>C</Answer>'), (('unhealthy diet', 'death'), '<Answer>C</Answer>')]
+    graph_edges = gpt_causal_discovery(entities, text=(text if use_text_in_causal_discovery else None), use_pretrained_knowledge=use_LLM_pretrained_knowledge_in_causal_discovery, reverse_variable_check=reverse_edge_for_variable_check, query_for_bidirected_edges=causal_discovery_query_for_bidirected_edges)
+    # graph_edges = [(('Excessive alcohol consumption', 'liver cirrhosis'), '<Answer>A</Answer>'), (('Excessive alcohol consumption', 'death'), '<Answer>A</Answer>'), (('liver cirrhosis', 'death'), '<Answer>A</Answer>'), (('unhealthy diet', 'weight increase'), '<Answer>A</Answer>'), (('weight increase', 'death'), '<Answer>C</Answer>'), (('weight increase', 'Excessive alcohol consumption'), '<Answer>C</Answer>'), (('weight increase', 'liver cirrhosis'), '<Answer>C</Answer>'), (('unhealthy diet', 'liver cirrhosis'), '<Answer>C</Answer>'), (('unhealthy diet', 'Excessive alcohol consumption'), '<Answer>C</Answer>'), (('unhealthy diet', 'death'), '<Answer>C</Answer>')]
     # graph_edges = [(('CANCER', 'TUMOR'), '<Answer>D</Answer>'), (('SMOKING', 'FUMES'), '<Answer>A</Answer>')]
     # graph_edges = [(('SMOKING', 'FUMES'), '<Answer>D</Answer>')]
 
@@ -769,9 +902,9 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_gpt_4=True, use
 
     nodes, directed_edges, bidirected_edges = preprocess_edges(edges, perform_edge_explanation)
 
-    graph_data = {'nodes': [nodes], 'edges': [directed_edges + bidirected_edges], 'cycles': []}
-    with open(f'{graph_directory_name}/{text_title}.json', "w") as json_file:
-            json.dump(graph_data, json_file, indent=4)
+    cycles = []
+    if search_cycles:
+        cycles = find_cycles(nodes=nodes, edges=directed_edges)
 
     if verbose:
         print('Nodes:')
@@ -780,11 +913,7 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_gpt_4=True, use
         print('Processed Edges:')
         print(directed_edges)
         print('--')
-
-    cycles = []
-    # if search_cycles:
-    #     cycles = find_cycles(nodes=nodes, edges=directed_edges)
-    print(bidirected_edges)
+    
     build_graph(nodes=nodes, edges=directed_edges, bidirected_edges=bidirected_edges, cycles=cycles, plot_static_graph=plot_static_graph, directory_name=graph_directory_name, graph_name=text_title, highlighted_text=text_with_highlighted_variables, edge_explanation=perform_edge_explanation)
     
     if verbose:
@@ -800,17 +929,22 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_gpt_4=True, use
         print_edges(graph_edges)
         print(f'exec time : {time.strftime("%H:%M:%S", time.gmtime(elapsed_seconds))}')
     
+    graph_data = {'nodes': nodes, 'edges': directed_edges + bidirected_edges, 'cycles': cycles, 'exec_time': time.strftime("%H:%M:%S", time.gmtime(elapsed_seconds))}
+    with open(f'{graph_directory_name}/{text_title}.json', "w") as json_file:
+            json.dump(graph_data, json_file, indent=4)
+
     return nodes, directed_edges + bidirected_edges, cycles
 
 
 # Example text for test
 def example_test(directory='../results/'):
     text = 'Excessive alcohol consumption can cause liver cirrhosis, and both can lead to death.'
-    text = 'Excessive alcohol consumption can cause liver cirrhosis, and both can lead to death. An uhealthy diet can result in weight increase.'
+    # text = 'Excessive alcohol consumption can cause liver cirrhosis, and both can lead to death. An uhealthy diet can result in weight increase. Poor dietary habits can cause diabetes.'
     text_title = 'Example test'
-    bidirected_edges=True
-    edge_explanation=True
+    bidirected_edges=False
+    entity_optimization=True
+    edge_explanation=False
     print(f'BI-EDGES     = {bidirected_edges}')
     print(f'EXPLANATION  = {edge_explanation}')
     # return causal_discovery_pipeline(text_title, text, use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, causal_discovery_query_for_bidirected_edges=False, perform_edge_explanation=True, optimize_found_entities=False, use_text_in_entity_optimization=False, search_cycles=False, plot_static_graph=False, graph_directory_name=directory, verbose=False)
-    return causal_discovery_pipeline(text_title, text, use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, causal_discovery_query_for_bidirected_edges=bidirected_edges, perform_edge_explanation=edge_explanation, optimize_found_entities=False, use_text_in_entity_optimization=False, search_cycles=False, plot_static_graph=False, graph_directory_name=directory, verbose=False)
+    return causal_discovery_pipeline(text_title, text, use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=False, reverse_edge_for_variable_check=False, causal_discovery_query_for_bidirected_edges=bidirected_edges, perform_edge_explanation=edge_explanation, optimize_found_entities=entity_optimization, use_text_in_entity_optimization=True, search_cycles=False, plot_static_graph=False, graph_directory_name=directory, verbose=False)

@@ -1,0 +1,2 @@
+,SHD,Ground Truth edges,Prediction edges,Missing edges,Extra edges,Correct direction,Incorrect direction,Precision,Recall,F1,AUPR,PRC point,Prediction
+0,0,3,3,0,0,3,0,1.0,1.0,1.0,1.0,"[(1.0, 1.0), (1.0, 0.0)]","[['Excessive alcohol consumption', 'liver cirrhosis'], ['Excessive alcohol consumption', 'death'], ['liver cirrhosis', 'death']]"

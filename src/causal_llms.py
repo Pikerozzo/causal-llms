@@ -54,7 +54,7 @@ def causal_analysis(data, file_name=None, use_short_abstracts=False, max_abstrac
         results.to_csv(file_name, index=False)
 
 
-        graph_data = {'nodes': [nodes], 'edges': [edges], 'cycles': [cycles]}
+        graph_data = {'nodes': nodes, 'edges': edges, 'cycles': cycles}
         with open(f'{graphs_directory}/{article_ref}.json', "w") as json_file:
             json.dump(graph_data, json_file, indent=4)
 
@@ -85,6 +85,39 @@ def run_benchmarks(model=benchmarks.Algorithm.GPT):
 
     benchmarks.run_benchmarks(model)
 
+
+def evaluate_results(ground_truth, prediction, results_directory=None):
+    print('EVALUATE RESULTS')
+    # abbiamo un semplice script/funzioncina che prende in input due .json con grafi sugli stessi nodi 
+    #   e misura le varie metriche che tu già consideri.
+    with open(ground_truth, 'r') as json_file:
+    # Parse the JSON data into a Python dictionary.
+        gt_graph = json.load(json_file)
+    with open(prediction, 'r') as json_file:
+    # Parse the JSON data into a Python dictionary.
+        pred_graph = json.load(json_file)
+
+    directory = f'../evaluations/{datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}' if results_directory is None else results_directory
+    os.makedirs(directory, exist_ok=True)
+
+    shd, aupr, curve, precision, recall, f1, prediction_edges, missing_edges, extra_edges, correct_direction, incorrect_direction = benchmarks.evaluate_predictions(gt_graph['nodes'], gt_graph['edges'], pred_graph['edges'])
+
+    results = pd.DataFrame({
+            'SHD': shd,
+            'Ground Truth edges': len(gt_graph['edges']),
+            'Prediction edges': len(prediction_edges),
+            'Missing edges': len(missing_edges),
+            'Extra edges': len(extra_edges),
+            'Correct direction': len(correct_direction),
+            'Incorrect direction': len(incorrect_direction),
+            'Precision': precision,
+            'Recall': recall,
+            'F1': f1,
+            'AUPR': aupr,
+            'PRC point': [curve],
+            'Prediction': [prediction_edges]
+        }, index=[0])
+    results.to_csv(f'{directory}/results.csv')
 
 
 def run_example_test():
@@ -137,9 +170,9 @@ The possible values are:
 def main():
 
     parser = MyArgumentParser()
-    parser.add_argument("action", choices=["ex", "s", "c", "sc","b"], help="Action to perform.")
+    parser.add_argument("action", choices=["ex", "s", "c", "sc","b", "e"], help="Action to perform.")
     parser.add_argument("--data-path", help="Path to the data for causal analysis.")
-    parser.add_argument("--algorithm", help="Path to the data for causal analysis.")
+    parser.add_argument("--algorithm", help="Path to the algorithm for causal analysis on benchmarks.")
 
 
     try:
@@ -185,6 +218,12 @@ def main():
                 print("Please provide the path to the data for causal analysis using the --data-path option.")
         elif args.action == "sc":
             scraping_and_causal_analysis()
+        elif args.action == "e":
+            gt = '../results/TEST - 2023-09-15_17-51-50/Example test.json'
+            pred = '../results/TEST - 2023-09-15_17-51-50/Example test.json'
+            gt = '../results/TEST - 2023-09-15_18-00-31/Example test.json'
+            pred = '../results/TEST - 2023-09-15_18-00-31/Example test.json'
+            evaluate_results(gt, pred)
         else:
             raise argparse.ArgumentError
     except argparse.ArgumentError:
