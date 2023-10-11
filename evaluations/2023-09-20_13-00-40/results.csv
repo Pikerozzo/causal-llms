@@ -1,0 +1,2 @@
+,Ground Truth Graph,Prediction Graph,SHD,Ground Truth edges,Prediction edges,Missing edges,Extra edges,Correct direction,Incorrect direction,Precision,Recall,F1,AUPR,PRC point,Prediction
+0,../results/TEST - 2023-09-15_18-00-31/Example test.json,../results/TEST - 2023-09-15_18-00-31/Example test.json,0,3,3,0,0,3,0,1.0,1.0,1.0,1.0,"[(1.0, 1.0), (1.0, 0.0)]","[['Excessive alcohol consumption', 'liver cirrhosis'], ['Excessive alcohol consumption', 'death'], ['liver cirrhosis', 'death']]"

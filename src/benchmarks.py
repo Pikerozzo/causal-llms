@@ -63,8 +63,9 @@ def benchmark_prediction(benchmark_title, ground_truth_nodes, ground_truth_edges
                             prediction_edges.extend([(node1, node2), (node2, node1)])
         plot_causal_graph(ground_truth_nodes, prediction_edges, f'{benchmark_title} - Baseline', graphs_directory)
     elif algorithm == Algorithm.GPT:
-        nodes, prediction_edges, cycles = gpt.causal_discovery_pipeline(f'{benchmark_title} - Prediction', '', entities=ground_truth_nodes, use_text_in_causal_discovery=False, use_LLM_pretrained_knowledge_in_causal_discovery=False, reverse_edge_for_variable_check=False, optimize_found_entities=False, use_text_in_entity_optimization=False, search_cycles=True, plot_static_graph=False, graph_directory_name=graphs_directory, verbose=False)
-
+        nodes, prediction_directed_edges, prediction_bidirected_edges, cycles = gpt.causal_discovery_pipeline(f'{benchmark_title} - Prediction', '', entities=ground_truth_nodes, use_text_in_causal_discovery=False, use_LLM_pretrained_knowledge_in_causal_discovery=False, reverse_edge_for_variable_check=False, optimize_found_entities=False, use_text_in_entity_optimization=False, search_cycles=True, plot_static_graph=False, graph_directory_name=graphs_directory, verbose=False)
+        prediction_edges = prediction_directed_edges + prediction_bidirected_edges
+        # nodes, prediction_edges, cycles = gpt.causal_discovery_pipeline(f'{benchmark_title} - Prediction', '', entities=ground_truth_nodes, use_text_in_causal_discovery=False, use_LLM_pretrained_knowledge_in_causal_discovery=False, reverse_edge_for_variable_check=False, optimize_found_entities=False, use_text_in_entity_optimization=False, search_cycles=True, plot_static_graph=False, graph_directory_name=graphs_directory, verbose=False)
 
     if verbose:
         print(prediction_edges)

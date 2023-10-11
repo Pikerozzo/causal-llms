@@ -1,0 +1,23 @@
+{
+    "nodes": [
+        "Excessive alcohol consumption",
+        "death",
+        "liver cirrhosis"
+    ],
+    "edges": [
+        [
+            "Excessive alcohol consumption",
+            "liver cirrhosis"
+        ],
+        [
+            "Excessive alcohol consumption",
+            "death"
+        ],
+        [
+            "liver cirrhosis",
+            "death"
+        ]
+    ],
+    "cycles": [],
+    "exec_time": "00:01:00"
+}

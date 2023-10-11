@@ -15,7 +15,7 @@ def sanitize_string(string, max_length=100):
     return string[:max_length] if max_length else string
 
 
-def causal_analysis(data, file_name=None, use_short_abstracts=False, max_abstract_length=200):
+def causal_analysis(data, file_name=None, causal_discovery_query_for_bidirected_edges=True, perform_edge_explanation=False, optimize_found_entities=True, use_short_abstracts=False, max_abstract_length=200):
 
     print('CAUSAL ANALYSIS PROCESS')
 
@@ -44,17 +44,19 @@ def causal_analysis(data, file_name=None, use_short_abstracts=False, max_abstrac
         title = sanitize_string(row['title'], 35)
         article_ref = f'{row["id"]}-{title}'
 
-        start = time.time()
+        # start = time.time()
         print(f'\n-------- {row["title"]} --------\n')
-        nodes, edges, cycles = gpt.causal_discovery_pipeline(article_ref, row['abstract'], use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, optimize_found_entities=True, use_text_in_entity_optimization=True, search_cycles=True, plot_static_graph=False, graph_directory_name=graphs_directory, verbose=False)
-        elapsed_seconds = time.time() - start
+        # nodes, edges, cycles = gpt.causal_discovery_pipeline(article_ref, row['abstract'], use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, optimize_found_entities=True, use_text_in_entity_optimization=True, search_cycles=True, plot_static_graph=False, graph_directory_name=graphs_directory, verbose=False)
+        nodes, directed_edges, bidirected_edges, cycles, elapsed_seconds, edge_explanation = gpt.causal_discovery_pipeline(article_ref, row['abstract'], causal_discovery_query_for_bidirected_edges=causal_discovery_query_for_bidirected_edges, perform_edge_explanation=perform_edge_explanation, use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, optimize_found_entities=optimize_found_entities, use_text_in_entity_optimization=True, search_cycles=True, plot_static_graph=False, graph_directory_name=graphs_directory, verbose=False)
+        # elapsed_seconds = time.time() - start
 
         new_row = pd.DataFrame({'id': row['id'], 'title': row['title'], 'abstract': row['abstract'], 'exec_time': time.strftime("%H:%M:%S", time.gmtime(elapsed_seconds))}, index=[0])
         results = pd.concat([results, new_row]).reset_index(drop=True)
         results.to_csv(file_name, index=False)
 
 
-        graph_data = {'nodes': nodes, 'edges': edges, 'cycles': cycles}
+        # graph_data = {'nodes': nodes, 'edges': edges, 'cycles': cycles}
+        graph_data = {'nodes': nodes, 'directed_edges': directed_edges, 'bidirected_edges':bidirected_edges, 'edge_explanation':edge_explanation, 'cycles': cycles, 'exec_time': time.strftime("%H:%M:%S", time.gmtime(elapsed_seconds))}
         with open(f'{graphs_directory}/{article_ref}.json', "w") as json_file:
             json.dump(graph_data, json_file, indent=4)
 
@@ -88,14 +90,27 @@ def run_benchmarks(model=benchmarks.Algorithm.GPT):
 
 def evaluate_results(ground_truth, prediction, results_directory=None):
     print('EVALUATE RESULTS')
-    # abbiamo un semplice script/funzioncina che prende in input due .json con grafi sugli stessi nodi 
-    #   e misura le varie metriche che tu già consideri.
-    with open(ground_truth, 'r') as json_file:
-    # Parse the JSON data into a Python dictionary.
-        gt_graph = json.load(json_file)
-    with open(prediction, 'r') as json_file:
-    # Parse the JSON data into a Python dictionary.
-        pred_graph = json.load(json_file)
+
+    try:
+        with open(ground_truth, 'r') as json_file:
+        # Parse the JSON data into a Python dictionary.
+            gt_graph = json.load(json_file)
+    except FileNotFoundError:
+        print(f"JSON file not found: {ground_truth}")
+        return
+    except pd.errors.ParserError:
+        print(f"Error parsing JSON file: {ground_truth}")
+        return
+    try:
+        with open(prediction, 'r') as json_file:
+        # Parse the JSON data into a Python dictionary.
+            pred_graph = json.load(json_file)
+    except FileNotFoundError:
+        print(f"JSON file not found: {prediction}")
+        return
+    except pd.errors.ParserError:
+        print(f"Error parsing JSON file: {prediction}")
+        return
 
     directory = f'../evaluations/{datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}' if results_directory is None else results_directory
     os.makedirs(directory, exist_ok=True)
@@ -103,6 +118,8 @@ def evaluate_results(ground_truth, prediction, results_directory=None):
     shd, aupr, curve, precision, recall, f1, prediction_edges, missing_edges, extra_edges, correct_direction, incorrect_direction = benchmarks.evaluate_predictions(gt_graph['nodes'], gt_graph['edges'], pred_graph['edges'])
 
     results = pd.DataFrame({
+            'Ground Truth Graph': ground_truth,
+            'Prediction Graph': prediction,
             'SHD': shd,
             'Ground Truth edges': len(gt_graph['edges']),
             'Prediction edges': len(prediction_edges),
@@ -126,8 +143,44 @@ def run_example_test():
     directory = f'../results/TEST - {datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}'
     os.makedirs(directory , exist_ok=True)
 
-    gpt.example_test(directory)
+    nodes, directed_edges, bidirected_edges, cycles, elapsed_seconds, edge_explanation = gpt.example_test(directory)
+
+    graph_data = {'nodes': nodes, 'directed_edges': directed_edges, 'bidirected_edges':bidirected_edges, 'edge_explanation':edge_explanation, 'cycles': cycles, 'exec_time': time.strftime("%H:%M:%S", time.gmtime(elapsed_seconds))}
+    with open(f'{directory}/Example test.json', "w") as json_file:
+        json.dump(graph_data, json_file, indent=4)
+
     print('\n--\nTEST COMPLETE')
+
+
+def plot_graph(graph_path):
+    try:
+        with open(graph_path, 'r') as json_file:
+            graph = json.load(json_file)
+    except FileNotFoundError:
+        print(f"JSON file not found: {graph_path}")
+        return
+    except pd.errors.ParserError:
+        print(f"Error parsing JSON file: {graph_path}")
+        return
+    
+    
+    # TODO add highlighted text to json (so that new graphs that already have it will still show it) ??
+
+    datetime_str = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    if '/' in graph_path:
+        graph_name = graph_path.split('/')[-1].split('.')[0]
+        directory = '/'.join(graph_path.split('/')[:-1])
+    elif '\\' in graph_path:
+        graph_name = graph_path.split('\\')[-1].split('.')[0]
+        directory = '\\'.join(graph_path.split('\\')[:-1])
+    else:
+        graph_name = 'mygraph'
+        directory = f'../graphs/{datetime_str}'
+
+    graph_name = f'{graph_name} - {datetime_str}'
+    
+
+    gpt.build_graph(nodes=graph['nodes'], edges=graph['directed_edges'], bidirected_edges=graph['bidirected_edges'], cycles=graph['cycles'], graph_name=graph_name, directory_name=directory, edge_explanation=graph['edge_explanation'], plot_static_graph=False)
 
 
 class MyArgumentParser(argparse.ArgumentParser):
@@ -147,6 +200,8 @@ Actions:
   c        Perform causal analysis.
   sc       Run scraping and causal analysis.
   b        Run the benchmark tests.
+  e        Evaluate prediction against ground truth graph.
+  p        Plot interactive causal graph.
 
 Options:
   --help   Show this help message and exit.
@@ -156,11 +211,13 @@ Examples:
   python causal_llms.py s                                # Run the scraping process.
   python causal_llms.py c --data-path </path/to/data>    # Perform causal analysis with specified data path.
   python causal_llms.py sc                               # Run scraping and causal analysis.
-  python causal_llms.py b --algorithm {b|gpt}            # Run the benchmark tests with the specified algorithm.
+  python causal_llms.py b --algorithm {baseline|gpt}     # Run the benchmark tests with the specified algorithm.
+  python causal_llms.py e --gt </path/to/ground_truth> --pred </path/to/prediction> # Evaluate prediction.
+  python causal_llms.py p --graph-path </path/to/graph>  # Plot interactive causal graph.
 
 The `algorithm` parameter specifies the algorithm to use for the benchmark tests.
 The possible values are:
-* `b`: Baseline algorithm
+* `baseline`: Baseline algorithm
 * `gpt`: GPT LLM
 """
         file.write(custom_help +"\n")
@@ -170,9 +227,12 @@ The possible values are:
 def main():
 
     parser = MyArgumentParser()
-    parser.add_argument("action", choices=["ex", "s", "c", "sc","b", "e"], help="Action to perform.")
+    parser.add_argument("action", choices=["ex", "s", "c", "sc","b", "e", "p", "t"], help="Action to perform.")
     parser.add_argument("--data-path", help="Path to the data for causal analysis.")
-    parser.add_argument("--algorithm", help="Path to the algorithm for causal analysis on benchmarks.")
+    parser.add_argument("--algorithm", help="Algorithm to use for causal analysis on benchmarks.")
+    parser.add_argument("--gt", help="Path to the ground truth graph for prediction evaluation.")
+    parser.add_argument("--pred", help="Path to the prediction graph for results evaluation.")  
+    parser.add_argument("--graph-path", help="Path to the graph-path graph to be plotted.")  
 
 
     try:
@@ -213,17 +273,27 @@ def main():
                     print(f"I/O error: {args.data_path}")
                     return
 
-                causal_analysis(data)
+                bidirected_edges=False
+                entity_optimization=True
+                edge_explanation=True
+                causal_analysis(data, causal_discovery_query_for_bidirected_edges=bidirected_edges, perform_edge_explanation=edge_explanation, optimize_found_entities=entity_optimization)
             else:
                 print("Please provide the path to the data for causal analysis using the --data-path option.")
         elif args.action == "sc":
             scraping_and_causal_analysis()
         elif args.action == "e":
-            gt = '../results/TEST - 2023-09-15_17-51-50/Example test.json'
-            pred = '../results/TEST - 2023-09-15_17-51-50/Example test.json'
-            gt = '../results/TEST - 2023-09-15_18-00-31/Example test.json'
-            pred = '../results/TEST - 2023-09-15_18-00-31/Example test.json'
-            evaluate_results(gt, pred)
+            evaluate_results(args.gt, args.pred)
+        elif args.action == "p":
+            plot_graph(args.graph_path)
+        elif args.action == "t":
+            data_path = '../data/'
+            files = ['ageing.csv', 'ARoUTI.csv', 'cardiovascular diseases.csv', 'diabetes.csv']
+            for file in files:
+                data = pd.read_csv(data_path + file)
+                bidirected_edges=False
+                entity_optimization=True
+                edge_explanation=True
+                causal_analysis(data=data, file_name=file.split('.')[0], causal_discovery_query_for_bidirected_edges=bidirected_edges, perform_edge_explanation=edge_explanation, optimize_found_entities=entity_optimization)
         else:
             raise argparse.ArgumentError
     except argparse.ArgumentError:

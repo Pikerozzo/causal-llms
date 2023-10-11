@@ -1,6 +1,14 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+
+import warnings
+
+# Ignore all runtime warnings
+warnings.filterwarnings("ignore")
+warnings.filterwarnings("ignore", category=RuntimeWarning)
+
+
 import subprocess
 import pkgutil
 
@@ -67,12 +75,7 @@ coherent_answers = [(forward_arrow, backward_arrow), (backward_arrow, forward_ar
 
 answer_pattern = re.compile(r'^([A-Z])[.:]')
 
-def init(use_gpt_4=True, query_for_bidirected_edges=True):
-
-    # if use_gpt_4 and gpt_4 in model_ids:
-    #     global default_model
-    #     default_model = gpt_4
-
+def init(query_for_bidirected_edges=True):
     if query_for_bidirected_edges:
         arrows[bidirectional_arrow_answer] = bidirectional_arrow
         coherent_answers.append((bidirectional_arrow, bidirectional_arrow))
@@ -345,100 +348,13 @@ object as your answer:
 }}
 </Answer>
 '''
-#     user_msg = f'''
-# You will be provided with {'an abstract of a medical research paper delimited by the <Text></Text> xml tags, and ' if text else ''} \
-# a list of named entities representing medical entities, each one of them delimited by the <Entity></Entity> xml tags. \
-
-# {f"""Text:
-# <Text>{text}</Text>""" if text else ""}
-
-# Entities:
-# {entities_text}
-
-# Your task is to optimize this entity list by identifying synonyms within the entities and grouping them accordingly. \
-# Your goal is to create a JSON object where the keys represent the root word entities, and each key is associated with \
-# an array of its synonyms, i.e., words or entities that can be used interchangeably to the root word.\
-# If a root word entity has no synonyms, its value in the JSON should be an empty array.
-
-# Ensure that each entity appears only once in the dictionary, either as key (i.e. root word) or as element in the value arrays (i.e. the synonyms): \
-# an entity must must not appear as key if it is the synonym (i.e. in the value array) of another entity, and the other way around (i.e. must not be \
-# in the value array of an entity if it is already a key of the JSON object).
-# An entity must not be a synonym of itself.
-
-# You should efficiently process the given list of entities and produce the desired dictionary structure.
-# The output JSON object should accurately represent the optimized entities and their synonyms based on the provided list.\
-
-# Then provide your final JSON object answer within the tags <Answer>[json_object]</Answer>, (e.g. <Answer>{{
-#     "smoking": ["tobacco", "nicotine", "cigarettes", "cigar"],
-#     "cancer": ["lung cancer"],
-#     "tumors": []
-# }}</Answer>).
-
-# Follow the example below to understand the expected output.
-
-# Example:
-
-# Given the initial list of entities:
-# <Entity>smoking</Entity>
-# <Entity>lung cancer</Entity>
-# <Entity>tumors</Entity>
-# <Entity>cancer</Entity>
-# <Entity>tobacco</Entity>
-# <Entity>nicotine</Entity>
-# <Entity>cigarettes</Entity>
-# <Entity>cigar</Entity>
-
-# You should pair the synonyms, generate the following JSON object and provide it as your answer:
-# <Answer>
-# {{
-#     "smoking": ["tobacco", "nicotine", "cigarettes", "cigar"],
-#     "cancer": ["lung cancer"],
-#     "tumors": []
-# }}
-# </Answer>
-
-# Note that every entity appears only once in the output JSON object, either as key or as element in the value arrays.
-
-# After you have finished building the JSON object, check and make sure that every entity appears only once in the output JSON object, \
-# either as key or as element in the value arrays.
-
-# After you have finished building the JSON object, perform an 
-
-# If you realize you have made a mistake by adding entities twice in the JSON object, you must go back and correct it.
-# For example, if you have added "lung cancer" as a synonym of "cancer" and "lung cancer" also appears as a key element, you should remove 
-# the redundant "lung cancer" element from the JSON object keys, while keeping it in the synonyms array of "cancer".
-
-# Follow the example below to understand how you should behave in case you realize an entity appears multiple times, as both key element and synonym in the value arrays.
-
-# Example:
-# If you create an output JSON object that looks like this:
-# <Answer>
-# {{
-#     "smoking": ["tobacco", "nicotine", "cigarettes", "cigar"],
-#     "cancer": ["lung cancer"],
-#     "lung cancer": ["cancer"],
-#     "tumors": []
-# }}
-# </Answer>
-
-# You should perform a careful check and realize that "lung cancer" appears both as key element and in the value arrays, as synonym of the "cancer" entity. \
-# You should remove the redundant "lung cancer" element from the JSON object keys, while keeping it in the synonyms array of "cancer", and provide the following JSON 
-# object as your answer:
-# <Answer>
-# {{
-#     "smoking": ["tobacco", "nicotine", "cigarettes", "cigar"],
-#     "cancer": ["lung cancer"],
-#     "tumors": []
-# }}
-# </Answer>
-# '''
     
     response = gpt_request(system_msg, user_msg, temperature=1)
     if response:
         soup = BeautifulSoup(response, 'html.parser')
         answer = soup.find('answer').text
         try:
-            print(f'\n{answer}\n') # TODO: remove
+            # print(f'\n{answer}\n') # TODO: remove
             opt_entities = json.loads(answer)
             if opt_entities:
                 return opt_entities
@@ -661,7 +577,7 @@ You should extract the piece of text that explains the causal relationship betwe
             soup = BeautifulSoup(response, 'html.parser')
             gpt_explanation = soup.find('answer').text
             try:
-                print((((e1, e2), answer), gpt_explanation))
+                # print((((e1, e2), answer), gpt_explanation))
                 graph_edges.append((((e1, e2), answer), gpt_explanation))
             except (json.JSONDecodeError, TypeError):
                 pass
@@ -688,7 +604,6 @@ def preprocess_edges(edges, perform_edge_explanation=False):
     bidirected_edges = []
 
     for edge in edges:
-    # for (n1, n2), answer in edges:
         if perform_edge_explanation:
             ((n1, n2), answer), explanation = edge
         else:
@@ -701,28 +616,13 @@ def preprocess_edges(edges, perform_edge_explanation=False):
         if direction:
             is_bidirectional = len(direction) == 2
 
-            # for bidirectional edges,
-            #    if explanation 
-            #           use (((n1,n2),(n2,n1)), 'text explanation')
-            #    else 
-            #           append (.extend()) array [(n1,n2),(n2,n1)], 
             if is_bidirectional:
+                direction = direction[0]
                 direction = [((direction[0],direction[1]), explanation)] if perform_edge_explanation else direction
                 bidirected_edges.extend(direction)
-
-                # if perform_edge_explanation:
-                #     direction = ((direction[0],direction[1]), explanation)
-                #     bidirected_edges.append(direction)
-                # else:
-                #     bidirected_edges.extend(direction)
             else:
                 direction = [(direction[0], explanation)] if perform_edge_explanation else direction
                 directed_edges.extend(direction)
-            
-            # if is_bidirectional:
-            #     bidirected_edges.append(direction)
-            # else:
-            #     directed_edges.append(direction)
 
     return list(nodes), directed_edges, bidirected_edges
 
@@ -741,7 +641,7 @@ def find_cycles(nodes=[], edges=[], return_first_100_cycles=True, edge_explanati
         nodes_ids[n] = v
 
     for edge in edges:
-        (n1, n2), _ = edge if edge_explanation else edge, _
+        (n1, n2), _ = edge if edge_explanation else (edge, None)
         e = g.add_edge(nodes_ids[n1], nodes_ids[n2])
 
     cycles = []
@@ -763,7 +663,7 @@ def build_graph(nodes, edges=[], bidirected_edges=[], cycles=[], plot_static_gra
 
     # for e1, e2 in edges:
     for edge in edges:
-        print(f'\n---\n{edge}')
+        # print(f'\n---\n{edge}')
         if edge_explanation:
             (e1, e2), explanation = edge
             G.add_edge(e1, e2, title=explanation, color='black', style='solid')
@@ -778,9 +678,9 @@ def build_graph(nodes, edges=[], bidirected_edges=[], cycles=[], plot_static_gra
 
     for edge in bidirected_edges:
     # for e1, e2 in bidirected_edges:
-        print(f'\n---\n{edge}')
+        # print(f'\n---\n{edge}')
         if edge_explanation:
-            ((e1, e2), _), explanation = edge
+            (e1, e2), explanation = edge
             G.add_edge(e1, e2, title=explanation, color='grey', style='dashed')
             G.add_edge(e2, e1, color='grey', style='dashed')
         else:
@@ -796,9 +696,7 @@ def build_graph(nodes, edges=[], bidirected_edges=[], cycles=[], plot_static_gra
         edge_colors = [G.edges[edge]['color'] for edge in G.edges()]
         edge_styles = [G.edges[edge]['style'] for edge in G.edges()]
 
-        nx.draw(G, pos, node_color='skyblue', node_size=1500,
-                font_size=10, font_weight='bold', arrowsize=20, edge_color=edge_colors, style=edge_styles,
-                width=2)
+        nx.draw(G, pos, node_color='skyblue', node_size=1500,font_size=10, font_weight='bold', arrowsize=20, edge_color=edge_colors, style=edge_styles,width=2)
         plt.title(graph_name)
         plt.show()
 
@@ -835,9 +733,12 @@ def build_graph(nodes, edges=[], bidirected_edges=[], cycles=[], plot_static_gra
 def causal_discovery_pipeline(text_title, text, entities=[], use_gpt_4=True, use_text_in_causal_discovery=False, use_LLM_pretrained_knowledge_in_causal_discovery=False, causal_discovery_query_for_bidirected_edges=True, perform_edge_explanation=False, reverse_edge_for_variable_check=False, optimize_found_entities=True, use_text_in_entity_optimization=True, search_cycles=True, plot_static_graph=True, graph_directory_name='../graphs', verbose=False):
     start = time.time()
 
-    init(use_gpt_4, causal_discovery_query_for_bidirected_edges)
+    init(causal_discovery_query_for_bidirected_edges)
 
-    print(default_model)
+    # print(f'bidirected_edges = {causal_discovery_query_for_bidirected_edges}')
+    # print(f'entity_optimization = {optimize_found_entities}')
+    # print(f'edge_explanation = {perform_edge_explanation}')
+
     if verbose and text:
         print('Text:')
         print(text)
@@ -867,9 +768,6 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_gpt_4=True, use
     print(f'Opt. Entities ({len(entities)}): {entities}') # TODO remove
 
     graph_edges = gpt_causal_discovery(entities, text=(text if use_text_in_causal_discovery else None), use_pretrained_knowledge=use_LLM_pretrained_knowledge_in_causal_discovery, reverse_variable_check=reverse_edge_for_variable_check, query_for_bidirected_edges=causal_discovery_query_for_bidirected_edges)
-    # graph_edges = [(('Excessive alcohol consumption', 'liver cirrhosis'), '<Answer>A</Answer>'), (('Excessive alcohol consumption', 'death'), '<Answer>A</Answer>'), (('liver cirrhosis', 'death'), '<Answer>A</Answer>'), (('unhealthy diet', 'weight increase'), '<Answer>A</Answer>'), (('weight increase', 'death'), '<Answer>C</Answer>'), (('weight increase', 'Excessive alcohol consumption'), '<Answer>C</Answer>'), (('weight increase', 'liver cirrhosis'), '<Answer>C</Answer>'), (('unhealthy diet', 'liver cirrhosis'), '<Answer>C</Answer>'), (('unhealthy diet', 'Excessive alcohol consumption'), '<Answer>C</Answer>'), (('unhealthy diet', 'death'), '<Answer>C</Answer>')]
-    # graph_edges = [(('CANCER', 'TUMOR'), '<Answer>D</Answer>'), (('SMOKING', 'FUMES'), '<Answer>A</Answer>')]
-    # graph_edges = [(('SMOKING', 'FUMES'), '<Answer>D</Answer>')]
 
     edges = extract_edge_answers(graph_edges)
     if verbose:
@@ -904,7 +802,7 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_gpt_4=True, use
 
     cycles = []
     if search_cycles:
-        cycles = find_cycles(nodes=nodes, edges=directed_edges)
+        cycles = find_cycles(nodes=nodes, edges=directed_edges, edge_explanation=perform_edge_explanation)
 
     if verbose:
         print('Nodes:')
@@ -928,12 +826,8 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_gpt_4=True, use
     if verbose:
         print_edges(graph_edges)
         print(f'exec time : {time.strftime("%H:%M:%S", time.gmtime(elapsed_seconds))}')
-    
-    graph_data = {'nodes': nodes, 'edges': directed_edges + bidirected_edges, 'cycles': cycles, 'exec_time': time.strftime("%H:%M:%S", time.gmtime(elapsed_seconds))}
-    with open(f'{graph_directory_name}/{text_title}.json', "w") as json_file:
-            json.dump(graph_data, json_file, indent=4)
 
-    return nodes, directed_edges + bidirected_edges, cycles
+    return nodes, directed_edges, bidirected_edges, cycles, elapsed_seconds, perform_edge_explanation
 
 
 # Example text for test
@@ -946,5 +840,4 @@ def example_test(directory='../results/'):
     edge_explanation=False
     print(f'BI-EDGES     = {bidirected_edges}')
     print(f'EXPLANATION  = {edge_explanation}')
-    # return causal_discovery_pipeline(text_title, text, use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, causal_discovery_query_for_bidirected_edges=False, perform_edge_explanation=True, optimize_found_entities=False, use_text_in_entity_optimization=False, search_cycles=False, plot_static_graph=False, graph_directory_name=directory, verbose=False)
     return causal_discovery_pipeline(text_title, text, use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=False, reverse_edge_for_variable_check=False, causal_discovery_query_for_bidirected_edges=bidirected_edges, perform_edge_explanation=edge_explanation, optimize_found_entities=entity_optimization, use_text_in_entity_optimization=True, search_cycles=False, plot_static_graph=False, graph_directory_name=directory, verbose=False)
