@@ -1,0 +1,6 @@
+sentence,entities,gt_relation,pred_relation,pred_edge,is_edge_test_contradictory,exec_time
+"Pavlov-like, looking at the picture aids ""let-down,"" the release of milk normally triggered by the presence of the baby, its touch, its cry.","['release', 'presence']",1,1,"('presence', 'release')",False,00:00:35
+"In the same way that diet and stress effect facial acne they also effect body acne therefore the basic ""clear skin rules"" of cutting out greasy, fatty foods, and sugary foods as well as trying to reduce everyday stress apply to body acne as well.","['stress', 'acne']",0,0,"('stress', 'acne')",False,00:00:36
+"Short-term side effects are uncommon, but include headache from eyestrain, nausea, agitation or nervousness.","['headache', 'eyestrain']",1,1,"('eyestrain', 'headache')",False,00:00:28
+"The recession caused by the stock bubble was relatively mild, but so was the recovery.","['recession', 'stock bubble']",1,1,"('stock bubble', 'recession')",False,00:00:30
+The Maryland Department of the Environment has already worked to reduce the amount of pollution from sources like cars and factories.,"['pollution', 'factories']",1,1,"('factories', 'pollution')",False,00:00:32

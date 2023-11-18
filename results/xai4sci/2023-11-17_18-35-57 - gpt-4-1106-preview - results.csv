@@ -1,0 +1,6 @@
+sentence,entities,gt_relation,pred_relation,pred_edge,is_edge_test_contradictory,exec_time
+She gave him a bottle with wine in it.,"['bottle', 'wine']",5,-1,[],False,00:00:35
+On Saturday in California a suitcase was discovered inside a trash receptacle with a corpse stuffed inside of it.,"['suitcase', 'receptacle']",4,-1,[],False,00:00:45
+The sample was contained in a tightly sealed silver crucible.,"['sample', 'silver crucible']",4,-1,[],False,00:00:52
+We have drained our toxins into Puget sound.,"['toxins', 'sound']",6,-1,[],False,00:01:24
+The bacon manufacture is the 74th greatest export of Denmark.,"['bacon', 'manufacture']",18,1,"('manufacture', 'bacon')",False,00:00:49

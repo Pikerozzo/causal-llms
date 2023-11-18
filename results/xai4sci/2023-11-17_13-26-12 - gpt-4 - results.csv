@@ -1,0 +1,5 @@
+sentence,entities,gt_relation,pred_relation,pred_edge,is_edge_test_contradictory,exec_time
+The current view is that the chronic inflammation in the distal part of the stomach caused by Helicobacter pylori infection results in an increased acid production from the non-infected upper corpus region of the stomach.,"['inflammation', 'infection']",1,1,"('infection', 'inflammation')",False,00:00:22
+The burst has been caused by water hammer pressure.,"['burst', 'pressure']",1,1,"('pressure', 'burst')",False,00:00:20
+"The singer, who performed three of the nominated songs, also caused a commotion on the red carpet.","['singer', 'commotion']",0,0,"('singer', 'commotion')",False,00:00:28
+"Suicide is one of the leading causes of death among pre-adolescents and teens, and victims of bullying are at an increased risk for committing suicide.","['Suicide', 'death']",0,0,"('Suicide', 'death')",False,00:00:15

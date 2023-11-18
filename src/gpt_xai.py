@@ -541,10 +541,8 @@ def build_graph(nodes, edges=[], bidirected_edges=[], cycles=[], plot_static_gra
 
 
 
-def causal_discovery_pipeline(text_title, text, entities=[], use_gpt_4=True, use_text_in_causal_discovery=False, use_LLM_pretrained_knowledge_in_causal_discovery=False, causal_discovery_query_for_bidirected_edges=True, perform_edge_explanation=False, reverse_edge_for_variable_check=False, optimize_found_entities=True, use_text_in_entity_optimization=True, search_cycles=True, plot_static_graph=True, graph_directory_name='../graphs', verbose=False):
+def causal_discovery_pipeline(text_title, text, entities=[], use_gpt_4=True, use_text_in_causal_discovery=False, use_LLM_pretrained_knowledge_in_causal_discovery=False, causal_discovery_query_for_bidirected_edges=True, perform_edge_explanation=False, reverse_edge_for_variable_check=False, optimize_found_entities=True, use_text_in_entity_optimization=True, build_causal_graph=False, search_cycles=True, plot_static_graph=True, graph_directory_name='../graphs', verbose=False):
     start = time.time()
-
-    init(causal_discovery_query_for_bidirected_edges)
 
     if verbose and text:
         print('Text:')
@@ -604,7 +602,8 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_gpt_4=True, use
         print(directed_edges[0])
         print('--')
     
-    build_graph(nodes=nodes, edges=directed_edges[0], bidirected_edges=bidirected_edges[0], plot_static_graph=plot_static_graph, directory_name=graph_directory_name, graph_name=text_title, edge_explanation=perform_edge_explanation)
+    if build_causal_graph:
+        build_graph(nodes=nodes, edges=directed_edges[0], bidirected_edges=bidirected_edges[0], plot_static_graph=plot_static_graph, directory_name=graph_directory_name, graph_name=text_title, edge_explanation=perform_edge_explanation)
 
     elapsed_seconds = time.time() - start
     if verbose:
@@ -619,10 +618,13 @@ def main():
 
     data['entities'] = data['entities'].apply(eval)
 
-    data = data.sample(5)
+    #data = data.sample(5)
+    data = data[1127:] # continue from last run
+    
+    init(False)
 
     reverse_edge_check=True
-    edge_explanation=True
+    edge_explanation=False
     results = pd.DataFrame(columns=['sentence', 'entities', 'gt_relation', 'pred_relation', 'pred_edge', 'is_edge_test_contradictory', 'exec_time'])
 
     file_name = f'../results/xai4sci/{datetime.now().strftime("%Y-%m-%d_%H-%M-%S")} - {default_model} - results.csv'
