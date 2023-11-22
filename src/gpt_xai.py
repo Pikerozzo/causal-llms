@@ -295,7 +295,7 @@ Consider the previous answers you gave to this same request that are incoherent 
 Examine the roles, interactions, and details surrounding the entities {"within the text" if text else ""}.
 Based {"only " if text and not use_pretrained_knowledge else ""}on {"the information in the text " if text else ""}{"and " if text and use_pretrained_knowledge else ""}\
 {"your pretrained knowledge" if use_pretrained_knowledge or not text else ""}, determine the most likely cause-and-effect \
-relationship between the entities from the following listed options (A, B, C, {", D" if query_for_bidirected_edges else ""}):\
+relationship between the entities from the following listed options (A, B, C{", D" if query_for_bidirected_edges else ""}):\
     '''
     option_choice_msg = f'''
 Your response should analyze the situation in a step-by-step manner, ensuring the correctness of the ultimate conclusion, which should 
@@ -346,76 +346,76 @@ Then provide your final answer within the tags <Answer>[answer]</Answer>, (e.g. 
 
 
 
-def gpt_edge_explanation(edges, text=None):
-    graph_edges = []
+# def gpt_edge_explanation(edges, text=None):
+#     graph_edges = []
     
-    system_msg = 'You are a helpful assistant for causal reasoning and cause-and-effect relationship discovery.'
+#     system_msg = 'You are a helpful assistant for causal reasoning and cause-and-effect relationship discovery.'
  
-    intro_msg = f'''
-You will be provided with {"a text delimited by the <Text></Text> xml tags, " if text else ""}\
-a pair of entities delimited by the <Entity></Entity> xml tags {"representing entities extracted from the given text" if text else ""}, 
-and the causal relationship found between the two entities delimited by the <Relationship></Relationship> xml tags, that has\
-been previously identified and extracted {"from the given text" if text else ""}.
+#     intro_msg = f'''
+# You will be provided with {"a text delimited by the <Text></Text> xml tags, " if text else ""}\
+# a pair of entities delimited by the <Entity></Entity> xml tags {"representing entities extracted from the given text" if text else ""}, 
+# and the causal relationship found between the two entities delimited by the <Relationship></Relationship> xml tags, that has\
+# been previously identified and extracted {"from the given text" if text else ""}.
 
-    {f"""
-    Text:
-    <Text>{text}</Text>""" if text else ""}
-    '''
-    instructions_msg = f'''
-Your first task is to read carefully the provided text and the causal relationship found between the two entities.
-Then, given the causal relationship {"and the provided text" if text else ""}, you should {"extract the piece of text or sentence that explains" if text else "provide a textual explanation of"} 
-the causal relationship between the two entities, representing the reason why that particular causal relationship was previously chosen.
-{"Make sure that the explanation of the causal relationship is actually extracted from the given text. Once you have an answer, check that is it extracted from the given text." if text else ""}
+#     {f"""
+#     Text:
+#     <Text>{text}</Text>""" if text else ""}
+#     '''
+#     instructions_msg = f'''
+# Your first task is to read carefully the provided text and the causal relationship found between the two entities.
+# Then, given the causal relationship {"and the provided text" if text else ""}, you should {"extract the piece of text or sentence that explains" if text else "provide a textual explanation of"} 
+# the causal relationship between the two entities, representing the reason why that particular causal relationship was previously chosen.
+# {"Make sure that the explanation of the causal relationship is actually extracted from the given text. Once you have an answer, check that is it extracted from the given text." if text else ""}
 
-Provide your final answer within the tags <Answer>[answer]</Answer>, (e.g. <Answer>Smoking increases the risk of respiratory disease</Answer>).
-If the two entities are not causally related, simply provide an empty answer within the tags <Answer></Answer>.
+# Provide your final answer within the tags <Answer>[answer]</Answer>, (e.g. <Answer>Smoking increases the risk of respiratory disease</Answer>).
+# If the two entities are not causally related, simply provide an empty answer within the tags <Answer></Answer>.
 
-Follow the example below to better understand the task and the expected output.
+# Follow the example below to better understand the task and the expected output.
 
-EXAMPLE:
+# EXAMPLE:
 
-Text:
-<Text>Smoking increases the risk of respiratory disease, and both can cause lung cancer.</Text>
+# Text:
+# <Text>Smoking increases the risk of respiratory disease, and both can cause lung cancer.</Text>
 
-Entities:
-<Entity>smoking</Entity>
-<Entity>respiratory disease</Entity>
+# Entities:
+# <Entity>smoking</Entity>
+# <Entity>respiratory disease</Entity>
 
-Relationship:
-<Relationship>"smoking" causes "respiratory disease"</Relationship>
+# Relationship:
+# <Relationship>"smoking" causes "respiratory disease"</Relationship>
 
-You should extract the piece of text that explains the causal relationship between the two entities, which in this case is:
-<Answer>Smoking increases the risk of respiratory disease</Answer>
-    '''
+# You should extract the piece of text that explains the causal relationship between the two entities, which in this case is:
+# <Answer>Smoking increases the risk of respiratory disease</Answer>
+#     '''
 
-    for (e1, e2), answer in edges:
-        textual_relationship = get_textual_answers(e1, e2, answer)
+#     for (e1, e2), answer in edges:
+#         textual_relationship = get_textual_answers(e1, e2, answer)
 
-        user_msg = f'''\
-        {intro_msg}
+#         user_msg = f'''\
+#         {intro_msg}
 
-        Entities:
-        <Entity>{e1}</Entity>
-        <Entity>{e2}</Entity>
+#         Entities:
+#         <Entity>{e1}</Entity>
+#         <Entity>{e2}</Entity>
 
-        Relationship:
-        <Relationship>{textual_relationship}</Relationship>
+#         Relationship:
+#         <Relationship>{textual_relationship}</Relationship>
 
-        {instructions_msg}
-        '''
+#         {instructions_msg}
+#         '''
 
-        response = gpt_request(system_msg, user_msg)
+#         response = gpt_request(system_msg, user_msg)
 
-        if response:
-            soup = BeautifulSoup(response, 'html.parser')
-            gpt_explanation = soup.find('answer').text
-            try:
-                # print((((e1, e2), answer), gpt_explanation))
-                graph_edges.append((((e1, e2), answer), gpt_explanation))
-            except (json.JSONDecodeError, TypeError):
-                pass
+#         if response:
+#             soup = BeautifulSoup(response, 'html.parser')
+#             gpt_explanation = soup.find('answer').text
+#             try:
+#                 # print((((e1, e2), answer), gpt_explanation))
+#                 graph_edges.append((((e1, e2), answer), gpt_explanation))
+#             except (json.JSONDecodeError, TypeError):
+#                 pass
 
-    return graph_edges
+#     return graph_edges
 
 
 
@@ -586,8 +586,8 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_gpt_4=True, use
         valid_edges.extend(corrected_edges)
         edges = valid_edges
     
-    if perform_edge_explanation:
-        edges = gpt_edge_explanation(edges, text=(text if use_text_in_causal_discovery else None))
+    # if perform_edge_explanation:
+    #     edges = gpt_edge_explanation(edges, text=(text if use_text_in_causal_discovery else None))
 
     if reverse_edge_for_variable_check:
         edges = [(edge, contradictory_edge_test[i]) for i, edge in enumerate(edges)]
@@ -614,12 +614,15 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_gpt_4=True, use
 
 
 def main():
-    data = pd.read_csv('../data/xai4sci/train - no_causal.csv')
+    # data = pd.read_csv('../data/xai4sci/train - no_causal.csv')
+    data = pd.read_csv('../data/xai4sci/test - full.csv')
 
     data['entities'] = data['entities'].apply(eval)
+    l = len(data)
 
+    data = data.sample()
     #data = data.sample(5)
-    data = data[1127:] # continue from last run
+    # data = data[1930:] # continue from last run
     
     init(False)
 
@@ -658,6 +661,7 @@ def main():
         new_row = pd.DataFrame({'sentence': row['sentence_no_tags'], 'entities': [row['entities']], 'gt_relation': str(row['relation']), 'pred_relation': pred_rel, 'pred_edge': [pred_edge], 'is_edge_test_contradictory':is_edge_test_contradictory, 'exec_time': time.strftime("%H:%M:%S", time.gmtime(elapsed_seconds))}, index=[0])
         results = pd.concat([results, new_row]).reset_index(drop=True)
         results.to_csv(file_name, index=False)
+        print(f'{i}/{l}')
 
 
     print(classification_report([(i if i in ['0', '1'] else '-1') for i in results['gt_relation'].values], results['pred_relation'].values, labels=[-1, 0, 1], target_names=['No relation', 'X -> Y', 'X <- Y']))

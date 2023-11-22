@@ -56,9 +56,13 @@ models = openai.Model.list()
 model_ids = [model['id'] for model in models['data']]
 
 gpt_4 = 'gpt-4'
+gpt_4_prev = 'gpt-4-1106-preview'
 default_model = 'gpt-3.5-turbo'
 use_gpt_4=True
-if use_gpt_4 and gpt_4 in model_ids:
+use_gpt_4_prev=True
+if use_gpt_4_prev and gpt_4_prev in model_ids:
+    default_model = gpt_4_prev
+elif use_gpt_4 and gpt_4 in model_ids:
     default_model = gpt_4
 
 
@@ -130,8 +134,12 @@ def gpt_ner(text):
     '''
     
     response = gpt_request(system_msg, user_msg)
+    while not response:
+        response = gpt_request(system_msg, user_msg)
+
     if not response:
-        return []
+        print('No response from GPT')
+        return [], ''
     
     answer_text = response
     
@@ -641,7 +649,7 @@ def find_cycles(nodes=[], edges=[], return_first_100_cycles=True, edge_explanati
         nodes_ids[n] = v
 
     for edge in edges:
-        (n1, n2), _ = edge if edge_explanation else (edge, None)
+        (n1, n2), expl = edge if edge_explanation else (edge, None)
         e = g.add_edge(nodes_ids[n1], nodes_ids[n2])
 
     cycles = []

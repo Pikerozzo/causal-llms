@@ -15,29 +15,32 @@ def sanitize_string(string, max_length=100):
     return string[:max_length] if max_length else string
 
 
-def causal_analysis(data, file_name=None, causal_discovery_query_for_bidirected_edges=True, perform_edge_explanation=False, optimize_found_entities=True, use_short_abstracts=False, max_abstract_length=200):
+def causal_analysis(data, file_name=None, directory_name=None, causal_discovery_query_for_bidirected_edges=True, perform_edge_explanation=False, optimize_found_entities=True, use_short_abstracts=False, max_abstract_length=200):
 
     print('CAUSAL ANALYSIS PROCESS')
 
     print(f'Starting at : {datetime.now().strftime("%H:%M:%S %d/%m/%Y")}')
 
     if file_name:
-        file_name = sanitize_string(file_name)
+        file_name = sanitize_string(file_name)        
+        file_name = f'{sanitize_string(file_name).split(".")[0]}.csv'
     else:
         file_name = f'causal_analysis_results.csv'
     
     directory = f'../results/{datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}'
+    if directory_name:
+        directory = f'{directory} - {directory_name}'
+
     file_name = f'{directory}/{file_name}'
     graphs_directory = f'{directory}/graphs'
     os.makedirs(directory, exist_ok=True)
     os.makedirs(graphs_directory, exist_ok=True)
 
     results = pd.DataFrame(columns=['id', 'title', 'abstract', 'exec_time'])
+    data_len = len(data)
+    print(data_len)
 
-    print(len(data))
-
-    for row in data.iterrows():
-        row = row[1]
+    for i, row in data.iterrows():
         if use_short_abstracts and len(row['abstract'].split(' ')) > max_abstract_length:
             continue
 
@@ -47,7 +50,7 @@ def causal_analysis(data, file_name=None, causal_discovery_query_for_bidirected_
         # start = time.time()
         print(f'\n-------- {row["title"]} --------\n')
         # nodes, edges, cycles = gpt.causal_discovery_pipeline(article_ref, row['abstract'], use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, optimize_found_entities=True, use_text_in_entity_optimization=True, search_cycles=True, plot_static_graph=False, graph_directory_name=graphs_directory, verbose=False)
-        nodes, directed_edges, bidirected_edges, cycles, elapsed_seconds, edge_explanation = gpt.causal_discovery_pipeline(article_ref, row['abstract'], causal_discovery_query_for_bidirected_edges=causal_discovery_query_for_bidirected_edges, perform_edge_explanation=perform_edge_explanation, use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, optimize_found_entities=optimize_found_entities, use_text_in_entity_optimization=True, search_cycles=True, plot_static_graph=False, graph_directory_name=graphs_directory, verbose=False)
+        nodes, directed_edges, bidirected_edges, cycles, elapsed_seconds, edge_explanation = gpt.causal_discovery_pipeline(article_ref, row['abstract'], causal_discovery_query_for_bidirected_edges=causal_discovery_query_for_bidirected_edges, perform_edge_explanation=perform_edge_explanation, use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=False, reverse_edge_for_variable_check=False, optimize_found_entities=optimize_found_entities, use_text_in_entity_optimization=True, search_cycles=True, plot_static_graph=False, graph_directory_name=graphs_directory, verbose=False)
         # elapsed_seconds = time.time() - start
 
         new_row = pd.DataFrame({'id': row['id'], 'title': row['title'], 'abstract': row['abstract'], 'exec_time': time.strftime("%H:%M:%S", time.gmtime(elapsed_seconds))}, index=[0])
@@ -59,6 +62,8 @@ def causal_analysis(data, file_name=None, causal_discovery_query_for_bidirected_
         graph_data = {'nodes': nodes, 'directed_edges': directed_edges, 'bidirected_edges':bidirected_edges, 'edge_explanation':edge_explanation, 'cycles': cycles, 'exec_time': time.strftime("%H:%M:%S", time.gmtime(elapsed_seconds))}
         with open(f'{graphs_directory}/{article_ref}.json', "w") as json_file:
             json.dump(graph_data, json_file, indent=4)
+        
+        print(f'{i+1}/{data_len} - {time.strftime("%H:%M:%S", time.gmtime(elapsed_seconds))}')
 
 
     return results
@@ -286,14 +291,15 @@ def main():
         elif args.action == "p":
             plot_graph(args.graph_path)
         elif args.action == "t":
-            data_path = '../data/'
+            data_path = '../data/xai_abstracts/'
             files = ['ageing.csv', 'ARoUTI.csv', 'cardiovascular diseases.csv', 'diabetes.csv']
             for file in files:
+                name = file.split('.')[0]
                 data = pd.read_csv(data_path + file)
                 bidirected_edges=False
                 entity_optimization=True
                 edge_explanation=True
-                causal_analysis(data=data, file_name=file.split('.')[0], causal_discovery_query_for_bidirected_edges=bidirected_edges, perform_edge_explanation=edge_explanation, optimize_found_entities=entity_optimization)
+                causal_analysis(data=data, file_name=name, directory_name=name, causal_discovery_query_for_bidirected_edges=bidirected_edges, perform_edge_explanation=edge_explanation, optimize_found_entities=entity_optimization)
         else:
             raise argparse.ArgumentError
     except argparse.ArgumentError:
