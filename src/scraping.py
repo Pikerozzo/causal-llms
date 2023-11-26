@@ -205,9 +205,6 @@ def main(return_data=True):
     while True:
         save = input()
         if save == 'y':
-            # print('Enter file name:')
-            # file_name = input()
-            # file_name = file_name.replace(' ', '_')
             file_name = f'data - {datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}'
             data = data_extraction_pipeline(terms=terms, n_articles=n_articles, file_name=file_name)
             break

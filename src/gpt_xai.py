@@ -38,7 +38,7 @@ from sklearn.metrics import classification_report
 
 import networkx as nx
 from pyvis.network import Network
-# import graph_tool.all as gt
+import graph_tool.all as gt
 
 from cdt.metrics import SHD, precision_recall
 
@@ -345,81 +345,6 @@ Then provide your final answer within the tags <Answer>[answer]</Answer>, (e.g. 
 
 
 
-
-# def gpt_edge_explanation(edges, text=None):
-#     graph_edges = []
-    
-#     system_msg = 'You are a helpful assistant for causal reasoning and cause-and-effect relationship discovery.'
- 
-#     intro_msg = f'''
-# You will be provided with {"a text delimited by the <Text></Text> xml tags, " if text else ""}\
-# a pair of entities delimited by the <Entity></Entity> xml tags {"representing entities extracted from the given text" if text else ""}, 
-# and the causal relationship found between the two entities delimited by the <Relationship></Relationship> xml tags, that has\
-# been previously identified and extracted {"from the given text" if text else ""}.
-
-#     {f"""
-#     Text:
-#     <Text>{text}</Text>""" if text else ""}
-#     '''
-#     instructions_msg = f'''
-# Your first task is to read carefully the provided text and the causal relationship found between the two entities.
-# Then, given the causal relationship {"and the provided text" if text else ""}, you should {"extract the piece of text or sentence that explains" if text else "provide a textual explanation of"} 
-# the causal relationship between the two entities, representing the reason why that particular causal relationship was previously chosen.
-# {"Make sure that the explanation of the causal relationship is actually extracted from the given text. Once you have an answer, check that is it extracted from the given text." if text else ""}
-
-# Provide your final answer within the tags <Answer>[answer]</Answer>, (e.g. <Answer>Smoking increases the risk of respiratory disease</Answer>).
-# If the two entities are not causally related, simply provide an empty answer within the tags <Answer></Answer>.
-
-# Follow the example below to better understand the task and the expected output.
-
-# EXAMPLE:
-
-# Text:
-# <Text>Smoking increases the risk of respiratory disease, and both can cause lung cancer.</Text>
-
-# Entities:
-# <Entity>smoking</Entity>
-# <Entity>respiratory disease</Entity>
-
-# Relationship:
-# <Relationship>"smoking" causes "respiratory disease"</Relationship>
-
-# You should extract the piece of text that explains the causal relationship between the two entities, which in this case is:
-# <Answer>Smoking increases the risk of respiratory disease</Answer>
-#     '''
-
-#     for (e1, e2), answer in edges:
-#         textual_relationship = get_textual_answers(e1, e2, answer)
-
-#         user_msg = f'''\
-#         {intro_msg}
-
-#         Entities:
-#         <Entity>{e1}</Entity>
-#         <Entity>{e2}</Entity>
-
-#         Relationship:
-#         <Relationship>{textual_relationship}</Relationship>
-
-#         {instructions_msg}
-#         '''
-
-#         response = gpt_request(system_msg, user_msg)
-
-#         if response:
-#             soup = BeautifulSoup(response, 'html.parser')
-#             gpt_explanation = soup.find('answer').text
-#             try:
-#                 # print((((e1, e2), answer), gpt_explanation))
-#                 graph_edges.append((((e1, e2), answer), gpt_explanation))
-#             except (json.JSONDecodeError, TypeError):
-#                 pass
-
-#     return graph_edges
-
-
-
-
 def normalize_edge_direction(e1, e2, answer):
     if answer in arrows:
         if arrows[answer] == forward_arrow:
@@ -586,9 +511,6 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_gpt_4=True, use
         valid_edges.extend(corrected_edges)
         edges = valid_edges
     
-    # if perform_edge_explanation:
-    #     edges = gpt_edge_explanation(edges, text=(text if use_text_in_causal_discovery else None))
-
     if reverse_edge_for_variable_check:
         edges = [(edge, contradictory_edge_test[i]) for i, edge in enumerate(edges)]
 
@@ -614,15 +536,10 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_gpt_4=True, use
 
 
 def main():
-    # data = pd.read_csv('../data/xai4sci/train - no_causal.csv')
     data = pd.read_csv('../data/xai4sci/test - full.csv')
 
     data['entities'] = data['entities'].apply(eval)
     l = len(data)
-
-    data = data.sample()
-    #data = data.sample(5)
-    # data = data[1930:] # continue from last run
     
     init(False)
 
@@ -631,7 +548,6 @@ def main():
     results = pd.DataFrame(columns=['sentence', 'entities', 'gt_relation', 'pred_relation', 'pred_edge', 'is_edge_test_contradictory', 'exec_time'])
 
     file_name = f'../results/xai4sci/{datetime.now().strftime("%Y-%m-%d_%H-%M-%S")} - {default_model} - results.csv'
-    # file_name = f'../results/xai4sci/results.csv'
     for i, row in enumerate(data.iterrows()):
         row = row[1]
         nodes, directed_edges, bidirected_edges, elapsed_seconds, edge_explanation = causal_discovery_pipeline(text_title=i, text=row['sentence_no_tags'], entities=row['entities'], use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=False, reverse_edge_for_variable_check=reverse_edge_check, causal_discovery_query_for_bidirected_edges=False, perform_edge_explanation=edge_explanation, optimize_found_entities=False, use_text_in_entity_optimization=True, search_cycles=False, plot_static_graph=False, verbose=False)
@@ -668,18 +584,4 @@ def main():
 
 
 if __name__ == "__main__":
-    #results = pd.read_csv('../results/xai4sci/2023-11-17_18-50-42 - gpt-4-1106-preview - results.csv')
-    #print(classification_report([(i if i in ['0', '1'] else '-1') for i in results['gt_relation'].values], results['pred_relation'].values, labels=[-1, 0, 1], target_names=['No relation', 'X -> Y', 'X <- Y']))
     main()
-
-
-
-
-
-#     print(classification_report([(i if i in [0, 1] else -1) for i in results['gt_relation'].values], results['pred_relation'].values, labels=[-1, 0, 1], target_names=['No relation', 'X -> Y', 'X <- Y']))
-
-
-# if __name__ == "__main__":
-#     # results = pd.read_csv('../results/xai4sci/2023-11-17_15-48-56 - gpt-4-1106-preview - results.csv')
-#     # print(classification_report(results['gt_relation'].values, results['pred_relation'].values, labels=[-1, 0, 1], target_names=['No relation', 'X -> Y', 'X <- Y']))
-#     main()

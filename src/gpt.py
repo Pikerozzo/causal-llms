@@ -35,7 +35,7 @@ import json
 
 import networkx as nx
 from pyvis.network import Network
-# import graph_tool.all as gt
+import graph_tool.all as gt
 
 from cdt.metrics import SHD, precision_recall
 
@@ -362,7 +362,6 @@ object as your answer:
         soup = BeautifulSoup(response, 'html.parser')
         answer = soup.find('answer').text
         try:
-            # print(f'\n{answer}\n') # TODO: remove
             opt_entities = json.loads(answer)
             if opt_entities:
                 return opt_entities
@@ -585,7 +584,6 @@ You should extract the piece of text that explains the causal relationship betwe
             soup = BeautifulSoup(response, 'html.parser')
             gpt_explanation = soup.find('answer').text
             try:
-                # print((((e1, e2), answer), gpt_explanation))
                 graph_edges.append((((e1, e2), answer), gpt_explanation))
             except (json.JSONDecodeError, TypeError):
                 pass
@@ -669,9 +667,7 @@ def build_graph(nodes, edges=[], bidirected_edges=[], cycles=[], plot_static_gra
 
     G.add_nodes_from(nodes)
 
-    # for e1, e2 in edges:
     for edge in edges:
-        # print(f'\n---\n{edge}')
         if edge_explanation:
             (e1, e2), explanation = edge
             G.add_edge(e1, e2, title=explanation, color='black', style='solid')
@@ -685,8 +681,6 @@ def build_graph(nodes, edges=[], bidirected_edges=[], cycles=[], plot_static_gra
         G[cycle[-1]][cycle[0]]['color'] = 'red'
 
     for edge in bidirected_edges:
-    # for e1, e2 in bidirected_edges:
-        # print(f'\n---\n{edge}')
         if edge_explanation:
             (e1, e2), explanation = edge
             G.add_edge(e1, e2, title=explanation, color='grey', style='dashed')
@@ -694,7 +688,6 @@ def build_graph(nodes, edges=[], bidirected_edges=[], cycles=[], plot_static_gra
         else:
             e1, e2 = edge
             G.add_edge(e1, e2, color='grey', style='dashed')
-        # G.add_edge(e1, e2, color='grey', style='dashed')
 
     if plot_static_graph:
         pos = nx.spring_layout(G)
@@ -743,10 +736,6 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_gpt_4=True, use
 
     init(causal_discovery_query_for_bidirected_edges)
 
-    # print(f'bidirected_edges = {causal_discovery_query_for_bidirected_edges}')
-    # print(f'entity_optimization = {optimize_found_entities}')
-    # print(f'edge_explanation = {perform_edge_explanation}')
-
     if verbose and text:
         print('Text:')
         print(text)
@@ -760,8 +749,6 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_gpt_4=True, use
             print('Skipping NER operation. Using provided entities.')
             print('--')
 
-    print(f'Entities ({len(entities)}): {entities}') # TODO remove
-
     if verbose:
         print(f'Entities: ({len(entities)} = {entities})')
         print('--')
@@ -773,8 +760,6 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_gpt_4=True, use
         if verbose:
             print(f'Optimized Entities: ({len(entities)} = {entities})')
         
-    print(f'Opt. Entities ({len(entities)}): {entities}') # TODO remove
-
     graph_edges = gpt_causal_discovery(entities, text=(text if use_text_in_causal_discovery else None), use_pretrained_knowledge=use_LLM_pretrained_knowledge_in_causal_discovery, reverse_variable_check=reverse_edge_for_variable_check, query_for_bidirected_edges=causal_discovery_query_for_bidirected_edges)
 
     edges = extract_edge_answers(graph_edges)
@@ -841,11 +826,8 @@ def causal_discovery_pipeline(text_title, text, entities=[], use_gpt_4=True, use
 # Example text for test
 def example_test(directory='../results/'):
     text = 'Excessive alcohol consumption can cause liver cirrhosis, and both can lead to death.'
-    # text = 'Excessive alcohol consumption can cause liver cirrhosis, and both can lead to death. An uhealthy diet can result in weight increase. Poor dietary habits can cause diabetes.'
     text_title = 'Example test'
     bidirected_edges=False
     entity_optimization=True
     edge_explanation=False
-    print(f'BI-EDGES     = {bidirected_edges}')
-    print(f'EXPLANATION  = {edge_explanation}')
     return causal_discovery_pipeline(text_title, text, use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=False, reverse_edge_for_variable_check=False, causal_discovery_query_for_bidirected_edges=bidirected_edges, perform_edge_explanation=edge_explanation, optimize_found_entities=entity_optimization, use_text_in_entity_optimization=True, search_cycles=False, plot_static_graph=False, graph_directory_name=directory, verbose=False)

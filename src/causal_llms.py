@@ -47,18 +47,13 @@ def causal_analysis(data, file_name=None, directory_name=None, causal_discovery_
         title = sanitize_string(row['title'], 35)
         article_ref = f'{row["id"]}-{title}'
 
-        # start = time.time()
         print(f'\n-------- {row["title"]} --------\n')
-        # nodes, edges, cycles = gpt.causal_discovery_pipeline(article_ref, row['abstract'], use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=True, reverse_edge_for_variable_check=False, optimize_found_entities=True, use_text_in_entity_optimization=True, search_cycles=True, plot_static_graph=False, graph_directory_name=graphs_directory, verbose=False)
         nodes, directed_edges, bidirected_edges, cycles, elapsed_seconds, edge_explanation = gpt.causal_discovery_pipeline(article_ref, row['abstract'], causal_discovery_query_for_bidirected_edges=causal_discovery_query_for_bidirected_edges, perform_edge_explanation=perform_edge_explanation, use_text_in_causal_discovery=True, use_LLM_pretrained_knowledge_in_causal_discovery=False, reverse_edge_for_variable_check=False, optimize_found_entities=optimize_found_entities, use_text_in_entity_optimization=True, search_cycles=True, plot_static_graph=False, graph_directory_name=graphs_directory, verbose=False)
-        # elapsed_seconds = time.time() - start
 
         new_row = pd.DataFrame({'id': row['id'], 'title': row['title'], 'abstract': row['abstract'], 'exec_time': time.strftime("%H:%M:%S", time.gmtime(elapsed_seconds))}, index=[0])
         results = pd.concat([results, new_row]).reset_index(drop=True)
         results.to_csv(file_name, index=False)
 
-
-        # graph_data = {'nodes': nodes, 'edges': edges, 'cycles': cycles}
         graph_data = {'nodes': nodes, 'directed_edges': directed_edges, 'bidirected_edges':bidirected_edges, 'edge_explanation':edge_explanation, 'cycles': cycles, 'exec_time': time.strftime("%H:%M:%S", time.gmtime(elapsed_seconds))}
         with open(f'{graphs_directory}/{article_ref}.json', "w") as json_file:
             json.dump(graph_data, json_file, indent=4)
