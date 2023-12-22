@@ -65,24 +65,9 @@ def benchmark_prediction(benchmark_title, ground_truth_nodes, ground_truth_edges
     elif algorithm == Algorithm.GPT:
         nodes, prediction_directed_edges, prediction_bidirected_edges, cycles = gpt.causal_discovery_pipeline(f'{benchmark_title} - Prediction', '', entities=ground_truth_nodes, use_text_in_causal_discovery=False, use_LLM_pretrained_knowledge_in_causal_discovery=False, reverse_edge_for_variable_check=False, optimize_found_entities=False, use_text_in_entity_optimization=False, search_cycles=True, plot_static_graph=False, graph_directory_name=graphs_directory, verbose=False)
         prediction_edges = prediction_directed_edges + prediction_bidirected_edges
-        # nodes, prediction_edges, cycles = gpt.causal_discovery_pipeline(f'{benchmark_title} - Prediction', '', entities=ground_truth_nodes, use_text_in_causal_discovery=False, use_LLM_pretrained_knowledge_in_causal_discovery=False, reverse_edge_for_variable_check=False, optimize_found_entities=False, use_text_in_entity_optimization=False, search_cycles=True, plot_static_graph=False, graph_directory_name=graphs_directory, verbose=False)
-
+        
     if verbose:
         print(prediction_edges)
-
-    # ground_truth_graph = nx.DiGraph()
-    # ground_truth_graph.add_nodes_from(ground_truth_nodes)
-    # ground_truth_graph.add_edges_from(ground_truth_edges)
-
-    # prediction_graph = nx.DiGraph()
-    # prediction_graph.add_nodes_from(ground_truth_nodes)
-    # prediction_graph.add_edges_from(prediction_edges)
-
-    # shd = SHD(ground_truth_graph, prediction_graph, double_for_anticausal=SHD_double_for_anticausal)
-
-    # aupr, curve = precision_recall(ground_truth_graph, prediction_graph)
-
-    # return shd, aupr, curve, prediction_edges, cycles
 
     return nodes, prediction_edges, cycles
 
@@ -142,7 +127,6 @@ def precision_recall_curve_plot(titles, curves, graph_path):
                 name=titles[i]
             ))
 
-    # ideal line
     fig.add_trace(go.Scatter(
                 x=[0.0, 1.0, 1.0],
                 y=[1.0, 1.0, 0.0],
@@ -224,7 +208,6 @@ def shd_hist(shd_values, benchmark_titles, graph_path):
 
 
 
-# Run causal discovery pipeline for all benchmarks
 def run_benchmarks(benchmark_algorithm=Algorithm.GPT):
 
     ground_truth_graphs = [
@@ -251,7 +234,6 @@ def run_benchmarks(benchmark_algorithm=Algorithm.GPT):
     data_list = []
 
     for title, ground_truth_nodes, ground_truth_edges in ground_truth_graphs:
-        # shd, aupr, curve, prediction_edges, prediction_cycles = benchmark_evaluation(title, ground_truth_nodes, ground_truth_edges, save_graphs=True, graphs_directory=graphs_directory_path, algorithm=benchmark_algorithm, verbose=True)
         nodes, prediction_edges, prediction_cycles = benchmark_prediction(title, ground_truth_nodes, ground_truth_edges, save_graphs=True, graphs_directory=graphs_directory_path, algorithm=benchmark_algorithm, verbose=True)
         shd, aupr, curve, precision, recall, f1, prediction_edges, missing_edges, extra_edges, correct_direction, incorrect_direction = evaluate_predictions(ground_truth_nodes, ground_truth_edges, prediction_edges)
         

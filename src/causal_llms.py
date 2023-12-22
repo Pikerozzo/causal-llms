@@ -93,7 +93,6 @@ def evaluate_results(ground_truth, prediction, results_directory=None):
 
     try:
         with open(ground_truth, 'r') as json_file:
-        # Parse the JSON data into a Python dictionary.
             gt_graph = json.load(json_file)
     except FileNotFoundError:
         print(f"JSON file not found: {ground_truth}")
@@ -103,7 +102,6 @@ def evaluate_results(ground_truth, prediction, results_directory=None):
         return
     try:
         with open(prediction, 'r') as json_file:
-        # Parse the JSON data into a Python dictionary.
             pred_graph = json.load(json_file)
     except FileNotFoundError:
         print(f"JSON file not found: {prediction}")
@@ -164,8 +162,6 @@ def plot_graph(graph_path):
         return
     
     
-    # TODO add highlighted text to json (so that new graphs that already have it will still show it) ??
-
     datetime_str = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     if '/' in graph_path:
         graph_name = graph_path.split('/')[-1].split('.')[0]
@@ -239,7 +235,6 @@ def main():
 
         args = parser.parse_args()
 
-        # Check and use the parsed action
         if args.action == "b":
             if args.algorithm.upper() in [attr for attr in dir(benchmarks.Algorithm) if attr.isupper()]:
                 run_benchmarks(model=getattr(benchmarks.Algorithm, args.algorithm.upper()))
